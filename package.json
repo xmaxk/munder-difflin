@@ -2,6 +2,14 @@
   "name": "munder-difflin",
   "version": "0.4.5",
   "private": true,
+  "packageManager": "pnpm@10.12.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "node-pty",
+      "esbuild"
+    ]
+  },
   "description": "Clones for you and your team, working 24/7 — a free, local-first multi-agent harness that turns the CLI coding agent you already run into a clone of you, coordinating an office of agents on your machine.",
   "main": "out/main/index.js",
   "author": "Chaitanya Giri",
