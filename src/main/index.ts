@@ -2559,7 +2559,14 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
   // the missing-CLI probe below (the engine binary lives in the IMAGE, so a host
   // PATH probe would wrongly kick off the installer) — the actual argv rewrite
   // happens at the very end, after every provider/resume/model flag is assembled.
-  const wantSandbox = opts.sandbox ?? opts.hive?.sandbox ?? readConfig().sandboxAgents === true;
+  // The god orchestrator stays on the host until its dedicated (tighter) sandbox
+  // profile exists — Phase 2. The generic worker profile does not fit it (its cwd
+  // is the whole harness home, it launches /remote-control, it is the hive scribe),
+  // and sandboxing it with that profile crash-loops the floor's orchestrator. A
+  // global sandboxAgents flag must NOT drag the god in by accident.
+  const wantSandbox =
+    !opts.hive?.isGod &&
+    (opts.sandbox ?? opts.hive?.sandbox ?? readConfig().sandboxAgents === true);
   if (opts.hive) opts.hive = { ...opts.hive, sandbox: wantSandbox };
   // ── Missing engine CLI → run its installer visibly (pre-spawn) ───────────────
   // If the agent's engine binary (claude/codex/…) isn't installed, spawning it
