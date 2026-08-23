@@ -5195,6 +5195,22 @@ function onSystemResume(reason: string): void {
   }, 15_000);
 }
 
+// BYOK keys for sandboxed workers, loaded into process.env at startup. electron-vite
+// dev does NOT pass ambient env vars (e.g. OPENROUTER_API_KEY exported by the launcher)
+// through to the spawned electron main process, so a key set that way never reaches
+// buildPtyEnv. This <userData>/agent-keys.env (plain KEY=VALUE) is read here instead —
+// launch-independent — and only fills keys not already present. Values already in the
+// BYOK secret store take precedence (this is the fallback, not an override).
+try {
+  const keysFile = join(app.getPath('userData'), 'agent-keys.env');
+  if (existsSync(keysFile)) {
+    for (const line of readFileSync(keysFile, 'utf8').split(/\r?\n/)) {
+      const m = /^\s*([A-Z][A-Z0-9_]*)\s*=\s*(.*)$/.exec(line);
+      if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim();
+    }
+  }
+} catch { /* best-effort; keys can still come from BYOK / ambient env */ }
+
 app.whenReady().then(() => {
   // Realtime Michael mic-gate hygiene (rt-8 / Pam rt-10 nit): the voice session
   // opens the mic permission gate by persisting realtimeVoiceEnabled=true and
