@@ -4626,9 +4626,15 @@ async function processSpawnRequest(filePath: string): Promise<void> {
   const bin = launch.bin;
   // Missing-CLI → FAIL FAST. A headless worker has no human to watch an installer,
   // so we never run the cc49e1e install banner here — we reject and tell god.
-  if (!ptyManager.isCommandAvailable(bin)) { fail(`engine CLI "${bin}" is not installed`); return; }
+  // EXCEPT a sandboxed worker runs the CLI from the image, not the host, so the
+  // host availability check would wrongly reject every non-claude engine (mirrors
+  // the same skip in spawnAgentCore).
+  if (!cfgSpawn.sandboxAgents && !ptyManager.isCommandAvailable(bin)) { fail(`engine CLI "${bin}" is not installed`); return; }
 
-  const isolate = raw.isolate !== false; // default true
+  // Worktree isolation composes badly with the container boundary (a worktree's
+  // .git points at the origin repo by absolute path, which is not mounted), so a
+  // sandboxed worker always runs in its plain cwd.
+  const isolate = raw.isolate !== false && !cfgSpawn.sandboxAgents; // default true, off when sandboxed
   // Base branch the worktree will be cut from (for the ahead-of-base safety check).
   let baseBranch = 'main';
   try { const br = await getBranch(cwd); if ('current' in br && br.current) baseBranch = br.current; } catch { /* keep default */ }
