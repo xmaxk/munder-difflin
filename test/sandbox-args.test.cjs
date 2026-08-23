@@ -126,4 +126,32 @@ const wrapped = buildSandboxArgs(input);
   console.log(`  ok  probes degrade cleanly (sandboxAvailable → ${avail.ok ? 'ok' : `unavailable: ${avail.reason}`})`);
 }
 
+// ── Phase 2: hooks.sock passthrough rides only with the uds runtime ──────────
+{
+  const sock = '/home/user/hive-home/hive/hooks.sock';
+  const withSock = buildSandboxArgs({ ...input, hiveSock: sock, runtime: 'runsc-uds' });
+  const a = withSock.args;
+  assert.strictEqual(a[a.indexOf('--runtime') + 1], 'runsc-uds');
+  const mounts = a.flatMap((v, i) => (v === '-v' ? [a[i + 1]] : []));
+  // The socket must NOT get its own mount — bind-mounting a host unix socket
+  // makes runsc fail to start; it rides the hive-root ro mount instead.
+  assert.ok(!mounts.some((m) => m.includes('hooks.sock')), 'no socket file mount ever');
+  const envs = a.flatMap((v, i) => (v === '-e' ? [a[i + 1]] : []));
+  assert.ok(envs.includes(`HIVE_SOCK=${sock}`), 'HIVE_SOCK crosses via env');
+  // A socket OUTSIDE the mounted hive root would dangle → env var withheld.
+  const stray = buildSandboxArgs({ ...input, hiveSock: '/elsewhere/hooks.sock', runtime: 'runsc-uds' });
+  assert.ok(!stray.args.some((x) => x.includes('/elsewhere/hooks.sock')), 'unreachable socket path withheld');
+  console.log('  ok  hooks.sock: env + runsc-uds, no socket mount, stray paths withheld');
+}
+
+// ── without hiveSock: env HIVE_SOCK alone must not leak, mount, or re-runtime ─
+{
+  const sock = '/home/user/hive-home/hive/hooks.sock';
+  const bare = buildSandboxArgs({ ...input, env: { ...input.env, HIVE_SOCK: sock } });
+  const a = bare.args;
+  assert.strictEqual(a[a.indexOf('--runtime') + 1], 'runsc', 'default runtime stays locked down');
+  assert.ok(!a.some((x) => x.includes('hooks.sock')), 'HIVE_SOCK via env alone crosses nothing');
+  console.log('  ok  no hiveSock input → locked-down default (env HIVE_SOCK ignored)');
+}
+
 console.log('sandbox-args: all assertions passed');

@@ -44,6 +44,13 @@ export interface SandboxSpawnInput {
   memory?: string;
   cpus?: string;
   pidsLimit?: number;
+  /** Phase 2 — hooks.sock passthrough: bind-mount the hive's UDS at its parity
+   *  path and let HIVE_SOCK cross, restoring the Stop-hook autonomy loop.
+   *  gVisor only opens host sockets under --host-uds=open, so pass
+   *  runtime: 'runsc-uds' alongside (agent-sandbox setup/05). */
+  hiveSock?: string;
+  /** Docker runtime name (default 'runsc'). */
+  runtime?: string;
 }
 
 const DEFAULT_PROXY = 'http://squid:3128';
@@ -88,7 +95,7 @@ export function buildSandboxArgs(input: SandboxSpawnInput): { command: string; a
     // ignores SIGTERM — the classic outlive-the-client bug).
     '-i', '-t', '--init',
     '--name', containerName,
-    '--runtime', 'runsc',
+    '--runtime', input.runtime ?? 'runsc',
     '--network', input.network ?? DEFAULT_NETWORK,
     // Same ceilings as run-sandbox.sh.
     '--memory', input.memory ?? '8g',
@@ -114,6 +121,17 @@ export function buildSandboxArgs(input: SandboxSpawnInput): { command: string; a
     args.push('-v', `${hiveRoot}/spawn-requests:${hiveRoot}/spawn-requests`);
     if (agentDir) args.push('-v', `${agentDir}:${agentDir}`);
   }
+  // Phase 2 — the Stop-hook loop. Deliberately NO mount of the socket file:
+  // bind-mounting a host UNIX SOCKET makes runsc fail to start the sandbox
+  // ("cannot read client sync file: EOF", verified live). The socket already
+  // rides the hive-root ro parity mount above, and under --host-uds=open
+  // (the runsc-uds runtime) connect() works through a read-only gofer mount —
+  // while plain runsc refuses it, which is why the default runtime stays
+  // locked down. Only pass the env var when the socket actually lives under
+  // the mounted hive root; anywhere else it would dangle unreachable.
+  if (input.hiveSock && hiveRoot && input.hiveSock.startsWith(`${hiveRoot}/`)) {
+    args.push('-e', `HIVE_SOCK=${input.hiveSock}`);
+  }
   // ── Env from ZERO: the allowlist + the proxy posture. Nothing inherited.
   for (const key of ENV_PASSTHROUGH) {
     const v = input.env[key];
@@ -136,6 +154,7 @@ const imageCache = new Map<string, boolean>();
 export function resetSandboxCaches(): void {
   availabilityCache = null;
   imageCache.clear();
+  udsRuntimeCache = undefined;
 }
 
 function dockerOk(dockerArgs: string[]): { status: number | null; stdout: string; stderr: string } {
@@ -177,6 +196,20 @@ export function sandboxImageAvailable(image: string): boolean {
   // Cache only positives: a user mid-setup shouldn't need an app restart for
   // the image to be seen once built.
   if (ok) imageCache.set(image, ok);
+  return ok;
+}
+
+const UDS_RUNTIME = 'runsc-uds';
+let udsRuntimeCache: boolean | undefined;
+
+/** Is the socket-passthrough runtime (runsc --host-uds=open) registered?
+ *  Positive-only cache — an operator who runs setup/05 mid-session shouldn't
+ *  need an app restart for the Stop-hook loop to start riding along. */
+export function sandboxUdsRuntimeAvailable(): boolean {
+  if (udsRuntimeCache) return true;
+  const r = dockerOk(['info', '--format', '{{json .Runtimes}}']);
+  const ok = r.status === 0 && r.stdout.includes(UDS_RUNTIME);
+  if (ok) udsRuntimeCache = true;
   return ok;
 }
 

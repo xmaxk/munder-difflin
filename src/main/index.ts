@@ -11,7 +11,7 @@ import { homedir } from 'node:os';
 import { request as httpsRequest } from 'node:https';
 import { PtyManager, type SpawnOptions } from './pty';
 import {
-  sandboxAvailable, sandboxImageAvailable, buildSandboxArgs, resolveSandboxHosts,
+  sandboxAvailable, sandboxImageAvailable, sandboxUdsRuntimeAvailable, buildSandboxArgs, resolveSandboxHosts,
   dockerKillContainer, dockerContainerRunning
 } from './sandbox';
 import { resolveCommand as resolveCliCommand } from './shellEnv';
@@ -2935,6 +2935,16 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
     if (worktreePaths.has(opts.id)) {
       console.warn('[sandbox] isolate+sandbox: the worktree\'s origin .git is not mounted — git inside the container will not resolve. Prefer a plain cwd (or a clone) for sandboxed agents.');
     }
+    // Phase 2 — hooks-socket passthrough. The Stop-hook autonomy loop needs the
+    // hive UDS inside the container, and gVisor only opens host sockets under
+    // the runsc-uds runtime (agent-sandbox setup/05). DEGRADE, don't fail: the
+    // agent is still fully confined without it — it just won't drain its inbox
+    // autonomously until the operator registers the runtime.
+    const hiveSock = opts.env?.HIVE_SOCK;
+    const udsOk = hiveSock ? sandboxUdsRuntimeAvailable() : false;
+    if (hiveSock && !udsOk) {
+      console.warn('[sandbox] hooks.sock cannot cross into gVisor without the runsc-uds runtime (agent-sandbox setup/05-uds-runtime.sh) — spawning confined WITHOUT the Stop-hook loop.');
+    }
     const wrapped = buildSandboxArgs({
       id: opts.id,
       command: opts.command,
@@ -2942,7 +2952,8 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
       cwd: opts.cwd,
       env: opts.env ?? {},
       image,
-      addHosts: await resolveSandboxHosts()
+      addHosts: await resolveSandboxHosts(),
+      ...(hiveSock && udsOk ? { hiveSock, runtime: 'runsc-uds' } : {})
     });
     // Respawn-in-place reuses the pty id → the deterministic name can collide
     // with a stale container (a wedged client leaves one behind). Sweep first.

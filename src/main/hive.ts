@@ -699,7 +699,10 @@ export class HiveManager {
     // `$HIVE_NODE` is POSIX-only syntax and expands to nothing under cmd.exe /
     // PowerShell, so every such instruction was dead on a Windows floor. Commands
     // we write for an agent to run bake `nodeCommand()`'s absolute path instead.
-    env.HIVE_NODE = this.nodeCommand();
+    // A sandboxed agent has no host Electron: the hive-node launcher execs a
+    // binary that does not exist inside the container, while the sandbox image
+    // guarantees plain `node` on PATH.
+    env.HIVE_NODE = meta.sandbox ? 'node' : this.nodeCommand();
     // Generic light/dark hint for TUIs that paint their own background. The app
     // defaults to light but every agent CLI assumed a dark terminal, so Crush and
     // OpenCode looked pasted into a light window. COLORFGBG is the classic
@@ -865,7 +868,7 @@ export class HiveManager {
     if (sock && shim) {
       env.HIVE_SOCK = sock;
       const settingsPath = join(dir, 'settings.json');
-      this.writeJson(settingsPath, this.hookSettings(shim, meta.cwd, opts.mcpDefaults, opts.theme));
+      this.writeJson(settingsPath, this.hookSettings(shim, meta.cwd, opts.mcpDefaults, opts.theme, meta.sandbox === true));
       args.push('--settings', settingsPath);
     }
     return { args, env };
@@ -1034,10 +1037,13 @@ export class HiveManager {
    *  (W3) the default MCP bundle merged into this PER-SESSION settings file. cwd
    *  scopes the filesystem/git servers; cfg (the consent map) gates which servers
    *  are written. Claude-only — this is invoked solely on the Claude spawn path. */
-  private hookSettings(shim: string, cwd: string, cfg: McpDefaultsMap, theme?: 'light' | 'dark'): unknown {
+  private hookSettings(shim: string, cwd: string, cfg: McpDefaultsMap, theme?: 'light' | 'dark', sandboxed = false): unknown {
     // Bundled node, NOT bare `node` — see nodeLauncherPath(). Claude runs each of
     // these through `sh -c` with a stripped PATH, where `node` is often absent.
-    const cmd = this.nodeRun(shim);
+    // In-container the hive-node launcher is a dead path (it execs the HOST
+    // Electron binary), while the sandbox image guarantees `node` on PATH and
+    // the shim rides the read-only hive mount at its parity path.
+    const cmd = sandboxed ? `node "${shim}"` : this.nodeRun(shim);
     const entry = (matcher?: string) => ({
       ...(matcher ? { matcher } : {}),
       hooks: [{ type: 'command', command: cmd }]
