@@ -56,6 +56,11 @@ export interface SandboxSpawnInput {
   hiveSock?: string;
   /** Docker runtime name (default 'runsc'). */
   runtime?: string;
+  /** God profile: the orchestrator's cwd IS the harness home (which contains the
+   *  hive), and it is the hive scribe — so it needs the hive WRITABLE, not the
+   *  worker's read-only single-writer boundary. When set, the ro hive / agent-dir
+   *  / spawn-requests mounts are skipped; the cwd rw mount already covers them. */
+  hiveWritable?: boolean;
 }
 
 const DEFAULT_PROXY = 'http://squid:3128';
@@ -124,7 +129,11 @@ export function buildSandboxArgs(input: SandboxSpawnInput): { command: string; a
   args.push('-w', input.cwd);
   const hiveRoot = input.env.HIVE_ROOT;
   const agentDir = input.env.AGENT_DIR;
-  if (hiveRoot) {
+  // hiveWritable (god): cwd == harnessHome already covers the hive rw, so skip the
+  // ro nesting. A worker's cwd is a project dir NOT containing the hive, so it
+  // needs these — including the ro root that makes single-writer-per-file a hard
+  // boundary the worker cannot cross.
+  if (hiveRoot && !input.hiveWritable) {
     args.push('-v', `${hiveRoot}:${hiveRoot}:ro`);
     args.push('-v', `${hiveRoot}/spawn-requests:${hiveRoot}/spawn-requests`);
     if (agentDir) args.push('-v', `${agentDir}:${agentDir}`);

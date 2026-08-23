@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
 import {
@@ -828,7 +828,31 @@ export function ensureClaudePermissionsAccepted(cwd?: string): void {
  * never crashes. Values already present are preserved (a live claude also writes
  * these files).
  */
-export function seedSandboxAgentHome(homeDir: string, cwd: string): void {
+/** Root for per-agent sandbox container homes. Deliberately under userData, NOT
+ *  under the harness home: the god's cwd is the harness home and it mounts rw, so
+ *  keeping seeded credentials out of that tree stops a sandboxed god from reading
+ *  every worker's copied login. */
+export function sandboxHomesRoot(): string {
+  return join(app.getPath('userData'), 'sandbox-homes');
+}
+
+export function seedSandboxAgentHome(homeDir: string, cwd: string, provider?: string): void {
+  // Non-claude engines authenticate from an OAuth config dir, not an onboarding
+  // seed. Copy the operator's host login (~/.codex, ~/.gemini for antigravity's
+  // agy) into the container home — same idea as claude's credential copy, engine-
+  // agnostic. opencode and other API-key engines need nothing (the key rides the
+  // env allowlist). Copy only if the source exists and the dest is empty, so a
+  // token the worker refreshed in place is never clobbered.
+  const copyHostDir = (rel: string): void => {
+    try {
+      const src = join(homedir(), rel);
+      const dst = join(homeDir, rel);
+      if (existsSync(src) && !existsSync(dst)) cpSync(src, dst, { recursive: true });
+    } catch { /* best-effort */ }
+  };
+  if (provider === 'codex') { copyHostDir('.codex'); return; }
+  if (provider === 'antigravity' || provider === 'gemini') { copyHostDir('.gemini'); return; }
+  if (provider && provider !== 'claude') return; // API-key engines: nothing to seed
   try {
     const claudeDir = join(homeDir, '.claude');
     mkdirSync(claudeDir, { recursive: true });

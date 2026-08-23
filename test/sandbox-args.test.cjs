@@ -126,6 +126,21 @@ const wrapped = buildSandboxArgs(input);
   console.log(`  ok  probes degrade cleanly (sandboxAvailable → ${avail.ok ? 'ok' : `unavailable: ${avail.reason}`})`);
 }
 
+// ── god profile: hiveWritable skips the ro hive nesting (cwd rw covers it) ────
+{
+  const god = buildSandboxArgs({ ...input, hiveWritable: true });
+  const mounts = god.args.flatMap((v, i) => (v === '-v' ? [god.args[i + 1]] : []));
+  assert.ok(!mounts.some((m) => m.endsWith(':ro') && m.includes('hive-home/hive')), 'no ro hive mount for god');
+  assert.ok(!mounts.some((m) => m.includes('/spawn-requests')), 'no separate spawn-requests mount for god');
+  assert.ok(!mounts.some((m) => m.includes('/agents/jim')), 'no separate agent-dir mount for god');
+  assert.ok(mounts.includes('/home/user/proj:/home/user/proj'), 'cwd still mounted rw (covers the hive for the god)');
+  // A normal worker (no hiveWritable) keeps the ro boundary.
+  const worker = buildSandboxArgs(input);
+  const wm = worker.args.flatMap((v, i) => (v === '-v' ? [worker.args[i + 1]] : []));
+  assert.ok(wm.some((m) => m.endsWith(':ro')), 'worker keeps the ro hive boundary');
+  console.log('  ok  hiveWritable drops the ro boundary for the god, workers keep it');
+}
+
 // ── Phase 2: persistent per-agent home mounts at /home/agent ─────────────────
 {
   const withHome = buildSandboxArgs({ ...input, home: '/hive/sandbox-homes/md-jim' });

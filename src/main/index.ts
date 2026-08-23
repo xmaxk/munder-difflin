@@ -18,7 +18,7 @@ import { resolveCommand as resolveCliCommand } from './shellEnv';
 import { initAutoUpdater, abortPendingRestart } from './updater';
 import { RealtimeFloorWatcher } from './realtimeFloorWatcher';
 import {
-  readConfig, writeConfig, setAgentTokenCap, resetConfig, ensureHarnessHome, ensureClaudePermissionsAccepted, seedSandboxAgentHome,
+  readConfig, writeConfig, setAgentTokenCap, resetConfig, ensureHarnessHome, ensureClaudePermissionsAccepted, seedSandboxAgentHome, sandboxHomesRoot,
   modelForRole, OPS_STANDUP_MISSION, HEARTBEAT_MISSION, COMPACT_MAINTENANCE_MISSION, type HarnessConfig, type ScheduledMission
 } from './config';
 import { listDir, readFileText, readFileBinary, writeFileText, statAbs, expandTilde } from './fs';
@@ -2559,14 +2559,7 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
   // the missing-CLI probe below (the engine binary lives in the IMAGE, so a host
   // PATH probe would wrongly kick off the installer) — the actual argv rewrite
   // happens at the very end, after every provider/resume/model flag is assembled.
-  // The god orchestrator stays on the host until its dedicated (tighter) sandbox
-  // profile exists — Phase 2. The generic worker profile does not fit it (its cwd
-  // is the whole harness home, it launches /remote-control, it is the hive scribe),
-  // and sandboxing it with that profile crash-loops the floor's orchestrator. A
-  // global sandboxAgents flag must NOT drag the god in by accident.
-  const wantSandbox =
-    !opts.hive?.isGod &&
-    (opts.sandbox ?? opts.hive?.sandbox ?? readConfig().sandboxAgents === true);
+  const wantSandbox = opts.sandbox ?? opts.hive?.sandbox ?? readConfig().sandboxAgents === true;
   if (opts.hive) opts.hive = { ...opts.hive, sandbox: wantSandbox };
   // ── Missing engine CLI → run its installer visibly (pre-spawn) ───────────────
   // If the agent's engine binary (claude/codex/…) isn't installed, spawning it
@@ -2952,19 +2945,14 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
     if (hiveSock && !udsOk) {
       console.warn('[sandbox] hooks.sock cannot cross into gVisor without the runsc-uds runtime (agent-sandbox setup/05-uds-runtime.sh) — spawning confined WITHOUT the Stop-hook loop.');
     }
-    // Phase 2 — persistent per-agent container home. A sandboxed agent has a
-    // fresh /home/agent with no ~/.claude, so interactive claude would land on
-    // the onboarding/login screen. Seed a home (login copied from the operator,
-    // onboarding, per-cwd trust) that also persists transcripts/--resume, and
-    // mount it. Keyed on the sanitized id so a respawn reuses the same home.
-    let sandboxHome: string | undefined;
-    const hh = readConfig().harnessHome;
-    if (hh) {
-      const safeId = opts.id.replace(/[^A-Za-z0-9_.-]/g, '-').slice(0, 80);
-      sandboxHome = join(expandTilde(hh), 'sandbox-homes', safeId);
-      try { mkdirSync(sandboxHome, { recursive: true }); } catch { /* best-effort */ }
-      if (claudeProvider) seedSandboxAgentHome(sandboxHome, opts.cwd);
-    }
+    // Phase 2 — persistent per-agent container home (login/onboarding/transcripts/
+    // --resume), under userData (NOT the harness home — see sandboxHomesRoot).
+    // Seeded per engine: claude gets its credential+onboarding+trust, codex/gemini
+    // get the operator's OAuth home copied, API-key engines (opencode) get nothing.
+    const safeId = opts.id.replace(/[^A-Za-z0-9_.-]/g, '-').slice(0, 80);
+    const sandboxHome = join(sandboxHomesRoot(), safeId);
+    try { mkdirSync(sandboxHome, { recursive: true }); } catch { /* best-effort */ }
+    seedSandboxAgentHome(sandboxHome, opts.cwd, provider);
     // FAIL CLOSED: sandbox-net has no route out, so squid IS the only egress. If
     // its IP can't be resolved (squid down, or mid-restart at spawn time), the
     // container would come up with a proxy env pointing at an unreachable name
@@ -2984,7 +2972,10 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
       env: opts.env ?? {},
       image,
       addHosts,
-      ...(sandboxHome ? { home: sandboxHome } : {}),
+      home: sandboxHome,
+      // God profile: its cwd IS the harness home (contains the hive) and it is the
+      // hive scribe, so it needs the hive writable — not the worker's ro boundary.
+      ...(opts.hive?.isGod ? { hiveWritable: true } : {}),
       ...(hiveSock && udsOk ? { hiveSock, runtime: 'runsc-uds' } : {})
     });
     // Respawn-in-place reuses the pty id → the deterministic name can collide
