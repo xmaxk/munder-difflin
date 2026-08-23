@@ -2893,7 +2893,11 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
     const scoped = PREFIX_BACKEND[prefix];
     const backends = scoped ? [scoped] : Object.keys(BACKEND_KEY_ENV);
     for (const backend of backends) {
-      const key = integrations.getSecret(providerKeyRef(backend));
+      // Prefer the encrypted BYOK store; fall back to process.env (populated at
+      // startup from <userData>/agent-keys.env). Sandboxed workers build their env
+      // from opts.env, NOT the ambient process.env, so a key set only in the
+      // environment must be pulled in HERE to reach them.
+      const key = integrations.getSecret(providerKeyRef(backend)) || process.env[BACKEND_KEY_ENV[backend]];
       if (!key) continue;
       extra[BACKEND_KEY_ENV[backend]] = key;
       // OpenCode/AI-SDK's Google provider reads GOOGLE_GENERATIVE_AI_API_KEY, not
