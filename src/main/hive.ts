@@ -20,7 +20,7 @@
  */
 import {
   existsSync, mkdirSync, readFileSync, writeFileSync, renameSync,
-  readdirSync, statSync, rmSync, appendFileSync, symlinkSync, copyFileSync, chmodSync
+  readdirSync, statSync, lstatSync, rmSync, appendFileSync, symlinkSync, copyFileSync, chmodSync
 } from 'node:fs';
 import { join, dirname, isAbsolute } from 'node:path';
 import { homedir } from 'node:os';
@@ -757,7 +757,7 @@ export class HiveManager {
           if (desc.kind === 'hooks') {
             if (desc.shim === 'agy') this.installAgyHooks();
             else if (desc.shim === 'codex') {
-              env.CODEX_HOME = this.installCodexHooks(dir);
+              env.CODEX_HOME = this.installCodexHooks(dir, meta.sandbox === true);
               // Codex refuses to run hooks from a config dir without persisted
               // "hook trust" (normally an interactive gate). Our hooks.json is
               // hive-authored inside an isolated CODEX_HOME, so we bypass that gate
@@ -1881,7 +1881,7 @@ export class HiveManager {
    *  untouched. The user's ~/.codex/auth.json is linked in and their config.toml is
    *  copied + extended (login + model/provider/trust settings still apply).
    *  Returns the CODEX_HOME path for the caller to put in the worker's env. */
-  private installCodexHooks(dir: string): string {
+  private installCodexHooks(dir: string, sandboxed = false): string {
     const home = join(dir, '.codex');
     try {
       mkdirSync(home, { recursive: true });
@@ -1890,18 +1890,31 @@ export class HiveManager {
       // (config.toml is NOT symlinked — we write our own below, seeded from theirs,
       // because it must carry our [hooks] tables.) Fall back to copy where symlinks
       // need privilege (Windows). Idempotent — skip if already linked.
+      // SANDBOXED: a symlink to the operator's host ~/.codex dangles in the container
+      // (that path isn't mounted; the agent home is /home/agent), so codex can't read
+      // the login (→ onboarding) and can't save one (→ ENOENT). Copy a REAL file into
+      // the mounted CODEX_HOME instead.
       const authSrc = join(userHome, 'auth.json');
       const authDest = join(home, 'auth.json');
-      if (existsSync(authSrc) && !existsSync(authDest)) {
-        try { symlinkSync(authSrc, authDest); }
-        catch { try { copyFileSync(authSrc, authDest); } catch { /* best-effort */ } }
+      if (existsSync(authSrc)) {
+        if (sandboxed) {
+          // Copy only when authDest is missing or a (dangling-in-container) symlink;
+          // a real file means codex refreshed its token in place — leave it.
+          let isLinkOrMissing = true;
+          try { isLinkOrMissing = lstatSync(authDest).isSymbolicLink(); } catch { isLinkOrMissing = true; }
+          if (isLinkOrMissing) { try { rmSync(authDest, { force: true }); copyFileSync(authSrc, authDest); } catch { /* best-effort */ } }
+        } else if (!existsSync(authDest)) {
+          try { symlinkSync(authSrc, authDest); } catch { try { copyFileSync(authSrc, authDest); } catch { /* best-effort */ } }
+        }
       }
       // The managed app-server daemon used by Codex Remote Control is launched
       // from the standalone install rooted at $CODEX_HOME/packages. Share the
       // user's installed binaries without duplicating them into every agent.
+      // Skip when sandboxed — the symlink target isn't mounted, and a dangling
+      // packages/ link only confuses codex; it falls back to the local TUI anyway.
       const packagesSrc = join(userHome, 'packages');
       const packagesDest = join(home, 'packages');
-      if (existsSync(packagesSrc) && !existsSync(packagesDest)) {
+      if (!sandboxed && existsSync(packagesSrc) && !existsSync(packagesDest)) {
         try {
           symlinkSync(packagesSrc, packagesDest, process.platform === 'win32' ? 'junction' : 'dir');
         } catch { /* remote integration falls back to a local TUI if unavailable */ }
@@ -1939,8 +1952,12 @@ export class HiveManager {
         const events = ['PreToolUse', 'PostToolUse', 'Stop', 'SubagentStop',
           'SessionStart', 'UserPromptSubmit', 'PreCompact', 'PostCompact'];
         config += '\n# --- munder-hive lifecycle hooks (auto-generated; do not edit) ---\n';
+        // In-container the hive-node launcher execs the HOST Electron binary (a dead
+        // path); the image guarantees plain `node`, and the shim rides the mounted
+        // hive at its parity path.
+        const hookCmd = sandboxed ? `node ${shim}` : this.nodeRunUnquoted(shim);
         for (const ev of events) {
-          config += `\n[[hooks.${ev}]]\n[[hooks.${ev}.hooks]]\ntype = "command"\ncommand = '${this.nodeRunUnquoted(shim)}'\ntimeout = 30\n`;
+          config += `\n[[hooks.${ev}]]\n[[hooks.${ev}.hooks]]\ntype = "command"\ncommand = '${hookCmd}'\ntimeout = 30\n`;
         }
       }
       writeFileSync(join(home, 'config.toml'), config, 'utf8');
