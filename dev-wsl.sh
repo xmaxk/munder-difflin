@@ -13,6 +13,13 @@ set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
 export LIBGL_ALWAYS_SOFTWARE=1
 export GALLIUM_DRIVER=llvmpipe
+# Route the OpenRouter key into MD's env so sandboxed opencode workers inherit it
+# (the alternative is adding it in MD's BYOK settings UI). Scoped, egress-limited.
+_or_env="$HOME/src/agent-sandbox/secrets/opencode.env"
+if [ -f "$_or_env" ]; then
+  _or_key="$(grep -E '^OPENROUTER_API_KEY=' "$_or_env" | head -1 | cut -d= -f2-)"
+  [ -n "$_or_key" ] && export OPENROUTER_API_KEY="$_or_key"
+fi
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 LOG="${TMPDIR:-/tmp}/munder-difflin-dev.log"
