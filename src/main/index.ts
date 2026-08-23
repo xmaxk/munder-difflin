@@ -2965,6 +2965,17 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
       try { mkdirSync(sandboxHome, { recursive: true }); } catch { /* best-effort */ }
       if (claudeProvider) seedSandboxAgentHome(sandboxHome, opts.cwd);
     }
+    // FAIL CLOSED: sandbox-net has no route out, so squid IS the only egress. If
+    // its IP can't be resolved (squid down, or mid-restart at spawn time), the
+    // container would come up with a proxy env pointing at an unreachable name
+    // and every model call would die with ERR_SOCKET_CLOSED — a confusing, silent
+    // failure. Refuse the spawn with a clear message instead of launching a doomed
+    // agent. (squid now holds a static IP — agent-sandbox setup/03 — so this only
+    // trips on a genuinely-down proxy.)
+    const addHosts = await resolveSandboxHosts();
+    if (!addHosts.squid) {
+      return { ok: false, error: 'Sandbox egress proxy (squid) is not reachable on sandbox-net — start it (agent-sandbox setup/03-network.sh) before spawning sandboxed agents. Refusing to spawn without egress.' };
+    }
     const wrapped = buildSandboxArgs({
       id: opts.id,
       command: opts.command,
@@ -2972,7 +2983,7 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
       cwd: opts.cwd,
       env: opts.env ?? {},
       image,
-      addHosts: await resolveSandboxHosts(),
+      addHosts,
       ...(sandboxHome ? { home: sandboxHome } : {}),
       ...(hiveSock && udsOk ? { hiveSock, runtime: 'runsc-uds' } : {})
     });
