@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
 import {
@@ -856,12 +856,22 @@ export function seedSandboxAgentHome(homeDir: string, cwd: string, provider?: st
   try {
     const claudeDir = join(homeDir, '.claude');
     mkdirSync(claudeDir, { recursive: true });
-    // 1) OAuth credential — copy the operator's login (only if not already there,
-    //    so a refreshed token the worker wrote back is not clobbered).
-    const srcCred = join(homedir(), '.claude', '.credentials.json');
+    // 1) Auth. PREFER the stable setup-token (CLAUDE_CODE_OAUTH_TOKEN, routed to the
+    //    worker via env): it is INDEPENDENT of the operator's browser login, so it
+    //    avoids the OAuth refresh-token ROTATION that silently invalidates a copied
+    //    ~/.claude/.credentials.json the moment either the host session or the agent
+    //    refreshes — the cause of a long-lived sandboxed agent going "Not logged in".
+    //    Copy the browser credential ONLY as a fallback when no setup-token exists.
     const dstCred = join(claudeDir, '.credentials.json');
-    if (existsSync(srcCred) && !existsSync(dstCred)) {
-      writeFileSync(dstCred, readFileSync(srcCred), { mode: 0o600 });
+    if (!process.env.CLAUDE_CODE_OAUTH_TOKEN) {
+      const srcCred = join(homedir(), '.claude', '.credentials.json');
+      if (existsSync(srcCred) && !existsSync(dstCred)) {
+        writeFileSync(dstCred, readFileSync(srcCred), { mode: 0o600 });
+      }
+    } else {
+      // Token auth: remove any previously-copied (now-stale, rotation-invalidated)
+      // credential so claude uses the setup-token env instead of a dead file.
+      try { rmSync(dstCred, { force: true }); } catch { /* best-effort */ }
     }
     // 2) bypass-mode flags.
     const settingsP = join(claudeDir, 'settings.json');

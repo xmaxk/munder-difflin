@@ -2568,6 +2568,14 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
   // home, finds nothing, and claude exits "No conversation found with session ID".
   let sandboxHome: string | undefined;
   if (wantSandbox) {
+    // A sandboxed claude agent authenticates from the stable setup-token, not a
+    // copied browser credential (see seedSandboxAgentHome). Route it into opts.env
+    // so sandbox.ts's env allowlist passes it into the container. From process.env
+    // (populated at startup from agent-keys.env) — MD's ambient env under
+    // electron-vite doesn't carry it otherwise.
+    if (claudeProvider && process.env.CLAUDE_CODE_OAUTH_TOKEN && !(opts.env?.CLAUDE_CODE_OAUTH_TOKEN)) {
+      opts.env = { ...(opts.env ?? {}), CLAUDE_CODE_OAUTH_TOKEN: process.env.CLAUDE_CODE_OAUTH_TOKEN };
+    }
     const safeSandboxId = opts.id.replace(/[^A-Za-z0-9_.-]/g, '-').slice(0, 80);
     sandboxHome = join(sandboxHomesRoot(), safeSandboxId);
     try { mkdirSync(sandboxHome, { recursive: true }); } catch { /* best-effort */ }
