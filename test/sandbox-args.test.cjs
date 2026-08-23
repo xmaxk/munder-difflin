@@ -126,6 +126,16 @@ const wrapped = buildSandboxArgs(input);
   console.log(`  ok  probes degrade cleanly (sandboxAvailable → ${avail.ok ? 'ok' : `unavailable: ${avail.reason}`})`);
 }
 
+// ── Phase 2: persistent per-agent home mounts at /home/agent ─────────────────
+{
+  const withHome = buildSandboxArgs({ ...input, home: '/hive/sandbox-homes/md-jim' });
+  const mounts = withHome.args.flatMap((v, i) => (v === '-v' ? [withHome.args[i + 1]] : []));
+  assert.ok(mounts.includes('/hive/sandbox-homes/md-jim:/home/agent'), 'home mounts at /home/agent');
+  // No home input → no /home/agent mount (ephemeral image home).
+  assert.ok(!wrapped.args.some((x) => x.includes('/home/agent')), 'no home mount when unset');
+  console.log('  ok  per-agent home mounts at /home/agent (only when provided)');
+}
+
 // ── Phase 2: hooks.sock passthrough rides only with the uds runtime ──────────
 {
   const sock = '/home/user/hive-home/hive/hooks.sock';

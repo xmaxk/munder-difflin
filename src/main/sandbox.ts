@@ -38,6 +38,11 @@ export interface SandboxSpawnInput {
    *  (127.0.0.11) is unreachable from gVisor's netstack, so container names
    *  never resolve — every peer must ride --add-host (same as run-sandbox.sh). */
   addHosts: Record<string, string>;
+  /** Phase 2 — persistent per-agent container home, bind-mounted at /home/agent.
+   *  Seeded (for claude) with login + onboarding + trust so an interactive worker
+   *  skips the first-run screens; also carries transcripts / --resume across
+   *  respawns. Omit for an ephemeral home (image default). */
+  home?: string;
   /** Egress proxy URL as seen from inside sandbox-net. */
   proxyUrl?: string;
   network?: string;
@@ -110,6 +115,9 @@ export function buildSandboxArgs(input: SandboxSpawnInput): { command: string; a
   // applies binds ordered by destination depth, so the rw mounts nest over the ro
   // hive root. Mounting ONLY the agent's own dir rw turns the hive's
   // single-writer-per-file convention into a boundary the agent cannot violate.
+  // Persistent per-agent home (login/onboarding/transcripts). Distinct subtree
+  // from cwd and the hive, so mount order is irrelevant.
+  if (input.home) args.push('-v', `${input.home}:/home/agent`);
   args.push('-v', `${input.cwd}:${input.cwd}`);
   // Start the engine IN the parity-mounted cwd — the image's default WORKDIR
   // (/work) is not the agent's project dir.

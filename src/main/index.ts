@@ -18,7 +18,7 @@ import { resolveCommand as resolveCliCommand } from './shellEnv';
 import { initAutoUpdater, abortPendingRestart } from './updater';
 import { RealtimeFloorWatcher } from './realtimeFloorWatcher';
 import {
-  readConfig, writeConfig, setAgentTokenCap, resetConfig, ensureHarnessHome, ensureClaudePermissionsAccepted,
+  readConfig, writeConfig, setAgentTokenCap, resetConfig, ensureHarnessHome, ensureClaudePermissionsAccepted, seedSandboxAgentHome,
   modelForRole, OPS_STANDUP_MISSION, HEARTBEAT_MISSION, COMPACT_MAINTENANCE_MISSION, type HarnessConfig, type ScheduledMission
 } from './config';
 import { listDir, readFileText, readFileBinary, writeFileText, statAbs, expandTilde } from './fs';
@@ -2945,6 +2945,19 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
     if (hiveSock && !udsOk) {
       console.warn('[sandbox] hooks.sock cannot cross into gVisor without the runsc-uds runtime (agent-sandbox setup/05-uds-runtime.sh) — spawning confined WITHOUT the Stop-hook loop.');
     }
+    // Phase 2 — persistent per-agent container home. A sandboxed agent has a
+    // fresh /home/agent with no ~/.claude, so interactive claude would land on
+    // the onboarding/login screen. Seed a home (login copied from the operator,
+    // onboarding, per-cwd trust) that also persists transcripts/--resume, and
+    // mount it. Keyed on the sanitized id so a respawn reuses the same home.
+    let sandboxHome: string | undefined;
+    const hh = readConfig().harnessHome;
+    if (hh) {
+      const safeId = opts.id.replace(/[^A-Za-z0-9_.-]/g, '-').slice(0, 80);
+      sandboxHome = join(expandTilde(hh), 'sandbox-homes', safeId);
+      try { mkdirSync(sandboxHome, { recursive: true }); } catch { /* best-effort */ }
+      if (claudeProvider) seedSandboxAgentHome(sandboxHome, opts.cwd);
+    }
     const wrapped = buildSandboxArgs({
       id: opts.id,
       command: opts.command,
@@ -2953,6 +2966,7 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
       env: opts.env ?? {},
       image,
       addHosts: await resolveSandboxHosts(),
+      ...(sandboxHome ? { home: sandboxHome } : {}),
       ...(hiveSock && udsOk ? { hiveSock, runtime: 'runsc-uds' } : {})
     });
     // Respawn-in-place reuses the pty id → the deterministic name can collide

@@ -813,3 +813,46 @@ export function ensureClaudePermissionsAccepted(cwd?: string): void {
     } catch { /* best-effort */ }
   }
 }
+
+/**
+ * Seed a SANDBOXED agent's container home (bind-mounted at /home/agent) so an
+ * interactive claude worker starts a working session instead of the first-run
+ * "Welcome / Select login method" screen. A fresh container has no ~/.claude, so
+ * unlike a host agent (which inherits the operator's login) it must be seeded:
+ *   1. copy the operator's OAuth credential so the worker authenticates as the
+ *      user — the sandbox's allowlisted egress is what bounds that credential;
+ *   2. the same bypass-mode flags as ensureClaudePermissionsAccepted;
+ *   3. hasCompletedOnboarding + per-cwd trust, which a fresh home lacks.
+ * The home persists per agent (across respawns), so transcripts and --resume
+ * survive too. Best-effort: on failure the worker merely shows onboarding again,
+ * never crashes. Values already present are preserved (a live claude also writes
+ * these files).
+ */
+export function seedSandboxAgentHome(homeDir: string, cwd: string): void {
+  try {
+    const claudeDir = join(homeDir, '.claude');
+    mkdirSync(claudeDir, { recursive: true });
+    // 1) OAuth credential — copy the operator's login (only if not already there,
+    //    so a refreshed token the worker wrote back is not clobbered).
+    const srcCred = join(homedir(), '.claude', '.credentials.json');
+    const dstCred = join(claudeDir, '.credentials.json');
+    if (existsSync(srcCred) && !existsSync(dstCred)) {
+      writeFileSync(dstCred, readFileSync(srcCred), { mode: 0o600 });
+    }
+    // 2) bypass-mode flags.
+    const settingsP = join(claudeDir, 'settings.json');
+    let s: Record<string, unknown> = {};
+    if (existsSync(settingsP)) { try { s = JSON.parse(readFileSync(settingsP, 'utf8')) as Record<string, unknown>; } catch { s = {}; } }
+    s.skipDangerousModePermissionPrompt = true;
+    s.skipAutoPermissionPrompt = true;
+    writeFileSync(settingsP, JSON.stringify(s, null, 2), 'utf8');
+    // 3) onboarding complete + per-cwd trust.
+    const dotP = join(homeDir, '.claude.json');
+    let c: { hasCompletedOnboarding?: boolean; projects?: Record<string, { hasTrustDialogAccepted?: boolean }> } = {};
+    if (existsSync(dotP)) { try { c = JSON.parse(readFileSync(dotP, 'utf8')); } catch { c = {}; } }
+    c.hasCompletedOnboarding = true;
+    c.projects = c.projects ?? {};
+    c.projects[cwd] = { ...(c.projects[cwd] ?? {}), hasTrustDialogAccepted: true };
+    writeFileSync(dotP, JSON.stringify(c, null, 2), 'utf8');
+  } catch { /* best-effort; worker falls back to onboarding, never crashes */ }
+}
