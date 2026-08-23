@@ -4,6 +4,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { delimiter, join, win32 } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ensureKilled, hardKillTree } from './procKill';
+import { dockerKillContainer } from './sandbox';
 import { expandTilde } from './fs';
 import { buildPtyEnv } from './ptyEnv';
 import { captureFromLoginShell, userShellPath } from './shellEnv';
@@ -49,6 +50,9 @@ interface PtySession {
   /** True after the child has emitted at least one frame. Automation waits for
    *  this before typing, so startup prompts cannot outrun the TUI subscription. */
   hasOutput: boolean;
+  /** Sandbox container behind this PTY's docker client, if any (see
+   *  SpawnOptions.containerName) — kill paths must reap it alongside the client. */
+  containerName?: string;
 }
 
 export interface SpawnOptions {
@@ -67,6 +71,11 @@ export interface SpawnOptions {
    *  MUST contain no embedded double-quotes (it is wrapped verbatim on Windows).
    *  `command` is still recorded for display but is not executed. */
   shellScript?: string;
+  /** Set by the sandbox wrapper (spawnAgentCore) when `command` is the `docker
+   *  run` CLIENT for a gVisor container of this name. Killing the client does
+   *  NOT stop the container, so every kill path must also `docker rm -f` it —
+   *  without this a "killed" sandboxed agent keeps running with its rw mounts. */
+  containerName?: string;
 }
 
 /**
@@ -336,6 +345,8 @@ export class PtyManager {
           s.proc.kill();
           ensureKilled(pid);
         } catch { /* already gone */ }
+        // Container outlives its docker client — reap it with the window's PTYs.
+        if (s.containerName) dockerKillContainer(s.containerName);
         void id;
       }
     }
@@ -661,7 +672,8 @@ export class PtyManager {
         command: resolved,
         lastOutputAt: Date.now(),
         hasOutput: false,
-        owner
+        owner,
+        containerName: opts.containerName
       };
       this.sessions.set(opts.id, session);
 
@@ -734,6 +746,9 @@ export class PtyManager {
       const pid = s.proc.pid;
       s.proc.kill();
       ensureKilled(pid); // verify + sweep the process group so no PID leaks
+      // Sandboxed session: the sweep above only reaps the docker CLIENT — the
+      // container survives it. Reap the container too or the agent lives on.
+      if (s.containerName) dockerKillContainer(s.containerName);
       this.sessions.delete(id);
       return { ok: true };
     } catch (e) {
@@ -741,14 +756,17 @@ export class PtyManager {
     }
   }
 
-  list(): Array<{ id: string; cwd: string; command: string; pid: number; lastOutputAt: number; hasOutput: boolean }> {
+  list(): Array<{ id: string; cwd: string; command: string; pid: number; lastOutputAt: number; hasOutput: boolean; containerName?: string }> {
     return Array.from(this.sessions.values()).map(s => ({
       id: s.id,
       cwd: s.cwd,
       command: s.command,
       pid: s.proc.pid,
       lastOutputAt: s.lastOutputAt,
-      hasOutput: s.hasOutput
+      hasOutput: s.hasOutput,
+      // Present only for sandboxed sessions — the health check probes the
+      // CONTAINER for these (the docker client's pid says nothing).
+      ...(s.containerName ? { containerName: s.containerName } : {})
     }));
   }
 
@@ -794,6 +812,10 @@ export class PtyManager {
         try { s.proc.kill(); } catch { /* noop */ }
         ensureKilled(pid);
       }
+      // Quit path: a sandboxed agent's container is NOT in the process tree —
+      // without this it outlives the whole app (synchronous, like the win sweep,
+      // because the main process exits before any deferred timer would fire).
+      if (s.containerName) dockerKillContainer(s.containerName);
     }
     this.sessions.clear();
   }

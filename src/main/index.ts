@@ -10,6 +10,10 @@ import { join, resolve, sep, basename, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { request as httpsRequest } from 'node:https';
 import { PtyManager, type SpawnOptions } from './pty';
+import {
+  sandboxAvailable, sandboxImageAvailable, buildSandboxArgs, resolveSandboxHosts,
+  dockerKillContainer, dockerContainerRunning
+} from './sandbox';
 import { resolveCommand as resolveCliCommand } from './shellEnv';
 import { initAutoUpdater, abortPendingRestart } from './updater';
 import { RealtimeFloorWatcher } from './realtimeFloorWatcher';
@@ -354,6 +358,11 @@ const worktreePaths = new Map<string, string>();
 /** id → the original repo cwd the worktree was created from (needed to run
  *  `git worktree remove` from the parent tree, not the worktree itself). */
 const worktreeOrigins = new Map<string, string>();
+/** Agents spawned with `sandbox: true` run behind a `docker run` client; this
+ *  maps the agent/pty id → the container name so teardown (and the pre-respawn
+ *  collision sweep) can `docker rm -f` it — killing the client alone leaves the
+ *  container running with its rw mounts. Mirrors worktreePaths' lifecycle. */
+const sandboxContainers = new Map<string, string>();
 
 /** A live god-triggered ephemeral worker, tracked from spawn to teardown. */
 interface WorkerRec {
@@ -454,6 +463,15 @@ function teardownPty(id: string): void {
     if (hive.enabled()) {
       try { hive.setArchived(agentId, true); } catch (e) { console.error('[hive] setArchived failed:', e); }
     }
+  }
+  // 1b) Reap this id's sandbox container, if any. The docker CLIENT dying (the
+  //     event that brought us here) does not stop the container — without this
+  //     sweep a crashed client leaves the agent running with its rw mounts.
+  //     Idempotent: rm -f on an already-gone container is swallowed.
+  const sandboxName = sandboxContainers.get(id);
+  if (sandboxName) {
+    sandboxContainers.delete(id);
+    try { dockerKillContainer(sandboxName); } catch { /* best-effort */ }
   }
   // 2) Remove the isolated worktree, if any. Non-blocking; errors are logged.
   const wtPath = worktreePaths.get(id);
@@ -2497,7 +2515,7 @@ function findCodexHomeForSession(sessionId: string, siblingsRoot: string): strin
 
 /** Spawn options shared by the `pty:spawn` IPC handler and the god-triggered
  *  ephemeral-worker watcher. */
-type AgentSpawnOptions = SpawnOptions & { hive?: AgentMeta; isolate?: boolean; resume?: boolean; requireResume?: boolean; resumeSessionId?: string; provider?: AgentProvider; noAutoInstall?: boolean };
+type AgentSpawnOptions = SpawnOptions & { hive?: AgentMeta; isolate?: boolean; sandbox?: boolean; resume?: boolean; requireResume?: boolean; resumeSessionId?: string; provider?: AgentProvider; noAutoInstall?: boolean };
 
 ipcMain.handle('pty:spawn', async (evt, opts: AgentSpawnOptions) => {
   if (!opts || typeof opts.id !== 'string' || typeof opts.cwd !== 'string' || typeof opts.command !== 'string') {
@@ -2534,6 +2552,15 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
   const claudeProvider = isClaudeProvider(provider);
   opts.provider = provider;
   if (opts.hive) opts.hive = { ...opts.hive, provider };
+  // ── Sandbox posture (gVisor wrapper, Phase 1) ────────────────────────────────
+  // Per-spawn `sandbox` wins in BOTH directions (true forces it, false opts out);
+  // unset falls back to the global default, and a restored agent re-asserts the
+  // posture persisted on its registry record. Resolved ONCE here because it gates
+  // the missing-CLI probe below (the engine binary lives in the IMAGE, so a host
+  // PATH probe would wrongly kick off the installer) — the actual argv rewrite
+  // happens at the very end, after every provider/resume/model flag is assembled.
+  const wantSandbox = opts.sandbox ?? opts.hive?.sandbox ?? readConfig().sandboxAgents === true;
+  if (opts.hive) opts.hive = { ...opts.hive, sandbox: wantSandbox };
   // ── Missing engine CLI → run its installer visibly (pre-spawn) ───────────────
   // If the agent's engine binary (claude/codex/…) isn't installed, spawning it
   // just dies with "— process exited (code 1) —" and the user has no idea why.
@@ -2551,7 +2578,10 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
   // isn't archived and no worktree is torn down) before the relaunch takes over.
   {
     const bin = opts.command.trim().split(/\s+/)[0] || opts.command;
-    if (bin && !opts.noAutoInstall && !ptyManager.isCommandAvailable(bin)) {
+    // Sandboxed spawns skip the whole ladder: the engine binary lives in the
+    // container image, not on the host PATH (image presence is gated at the
+    // wrap step below instead).
+    if (bin && !opts.noAutoInstall && !wantSandbox && !ptyManager.isCommandAvailable(bin)) {
       // The installer commands are `npm install -g …`. Probe for npm the same way
       // we probe for the engine CLI, so a no-Node machine gets the node-free rung
       // (or an honest manual hint) instead of watching `npm: not found` scroll by.
@@ -2884,6 +2914,41 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
   // unavailable/older Codex install still gets a normal local terminal.
   if (provider === 'codex' && opts.hive?.id) {
     await enableCodexRemoteForSpawn(opts, opts.hive.id);
+  }
+  // ── gVisor sandbox wrap (Phase 1) — LAST, after every flag/env is assembled ──
+  // Rewrites the spawn into `docker run --runtime runsc` on sandbox-net with
+  // parity mounts and an env allowlist (see sandbox.ts). FAIL CLOSED: a spawn
+  // that asked for a sandbox never silently runs unconfined.
+  if (wantSandbox) {
+    const avail = sandboxAvailable();
+    if (!avail.ok) {
+      return { ok: false, error: `Sandbox requested but unavailable: ${avail.reason}. Build the agent-sandbox infra or disable sandboxing for this agent.` };
+    }
+    const image = readConfig().sandboxImage ?? 'eval-sandbox';
+    if (!sandboxImageAvailable(image)) {
+      return { ok: false, error: `Sandbox image "${image}" not found — build it (agent-sandbox setup/04-build-sandbox.sh) or change sandboxImage.` };
+    }
+    // Worktree isolation composes badly with the container boundary: a worktree's
+    // `.git` FILE points at the ORIGIN repo's .git by absolute path, which is not
+    // mounted — git inside the sandbox would see a broken repo. Cloning is the
+    // Phase-2 answer; until then say so instead of failing mysteriously.
+    if (worktreePaths.has(opts.id)) {
+      console.warn('[sandbox] isolate+sandbox: the worktree\'s origin .git is not mounted — git inside the container will not resolve. Prefer a plain cwd (or a clone) for sandboxed agents.');
+    }
+    const wrapped = buildSandboxArgs({
+      id: opts.id,
+      command: opts.command,
+      args: opts.args ?? [],
+      cwd: opts.cwd,
+      env: opts.env ?? {},
+      image,
+      addHosts: await resolveSandboxHosts()
+    });
+    // Respawn-in-place reuses the pty id → the deterministic name can collide
+    // with a stale container (a wedged client leaves one behind). Sweep first.
+    dockerKillContainer(wrapped.containerName);
+    sandboxContainers.set(opts.id, wrapped.containerName);
+    opts = { ...opts, command: wrapped.command, args: wrapped.args, containerName: wrapped.containerName };
   }
   const res = ptyManager.spawn(opts, owner);
   if (res.ok) analytics.track('agent_spawned', { provider });
@@ -5012,6 +5077,14 @@ function healthCheckPtys(reason: string, awayMs: number | null): void {
   const ptys = ptyManager.list();
   const dead: string[] = [];
   for (const p of ptys) {
+    if (p.containerName) {
+      // Sandboxed session: the pid belongs to the docker CLIENT, whose liveness
+      // says nothing about the agent — ask docker about the CONTAINER instead.
+      // null = docker couldn't answer → treat as unknown, never as dead (a false
+      // 'wedged' verdict would trigger the renderer's auto-revive).
+      if (dockerContainerRunning(p.containerName) === false) dead.push(p.id);
+      continue;
+    }
     if (typeof p.pid === 'number' && p.pid > 0) {
       try { process.kill(p.pid, 0); }   // liveness probe only — never kills
       catch { dead.push(p.id); }        // ESRCH: process gone but PTY still registered
