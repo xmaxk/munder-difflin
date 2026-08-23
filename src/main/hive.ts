@@ -140,6 +140,9 @@ export interface AgentMeta {
   /** Michael's prep assistant — enriches prompts and forwards them to Michael.
    *  Send-only: excluded from broadcast fan-out so it never drains an inbox. */
   isAssistant?: boolean;
+  /** This agent runs inside a gVisor sandbox container. Persisted (the registry
+   *  spreads AgentMeta) so restore-on-restart keeps the same confinement. */
+  sandbox?: boolean;
 }
 
 export interface RegistryAgent extends AgentMeta {

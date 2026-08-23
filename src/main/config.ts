@@ -190,6 +190,14 @@ export interface HarnessConfig {
   registeredRepos: string[];
   /** When true, new agents are spawned with --permission-mode bypassPermissions. */
   autoMode: boolean;
+  /** Run agents inside gVisor sandbox containers (docker --runtime runsc on the
+   *  agent-sandbox infra: internal network + Squid egress allowlist). Default
+   *  FALSE — requires the operator to have built that infra. When a spawn asks
+   *  for a sandbox that isn't available it FAILS (closed), never silently runs
+   *  unconfined. Per-spawn `sandbox` (SpawnPtyOptions) overrides this default. */
+  sandboxAgents: boolean;
+  /** Container image sandboxed agents run in (must carry the engine CLIs). */
+  sandboxImage?: string;
   /** May the orchestrator ("Michael") spin up agents on its own?
    *
    *  Default FALSE. Spawning an agent is a SPEND decision, so it should not
@@ -423,6 +431,8 @@ const DEFAULTS: HarnessConfig = {
   recentHives: [],
   registeredRepos: [],
   autoMode: true,
+  sandboxAgents: false,
+  sandboxImage: 'eval-sandbox',
   orchestratorMaySpawn: false,
   defaultCommand: 'claude',
   godProvider: 'claude',

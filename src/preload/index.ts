@@ -208,6 +208,10 @@ export interface SpawnPtyOptions {
   hive?: HiveAgentMeta;
   /** When true (and cwd is a git repo), spawn the agent in its own git worktree. */
   isolate?: boolean;
+  /** When true, run this agent inside a gVisor sandbox container (fails closed
+   *  when the sandbox infra isn't available). Unset falls back to the global
+   *  HarnessConfig.sandboxAgents default; false forces an unsandboxed spawn. */
+  sandbox?: boolean;
   /** When true, continue the agent's prior CLI session if one was recorded
    *  (provider-aware: Claude/Grok `--resume`, Antigravity `--conversation`). For
    *  Claude the main process looks up the session id from the hive registry and
