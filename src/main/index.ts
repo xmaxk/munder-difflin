@@ -2907,7 +2907,16 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
     //    env var, built dynamically so permission:allow is GATED on autoMode (#2).
     if (provider === 'opencode') {
       const oc: Record<string, unknown> = { autoupdate: false };
-      if (cfg.autoMode) oc.permission = { edit: 'allow', bash: 'allow', webfetch: 'allow' };
+      // `external_directory` gates any tool touching paths OUTSIDE the cwd — and a
+      // hive worker's inbox/outbox/memory live under <harnessHome>/hive, outside its
+      // project cwd, so without this opencode prompts on every spawn (the approval
+      // does not persist across respawns). `read` covers reading those files. The
+      // sandbox's mounts + egress are the real boundary here, so a blanket allow of
+      // external paths is safe inside the container.
+      if (cfg.autoMode) oc.permission = {
+        edit: 'allow', bash: 'allow', webfetch: 'allow', read: 'allow',
+        external_directory: { '**': 'allow' }
+      };
       const baseUrl = cfg.providerBaseUrls?.opencode;
       if (baseUrl) {
         // Register the model id the user actually selects (the part after 'local/')
