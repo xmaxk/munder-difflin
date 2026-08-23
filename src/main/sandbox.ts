@@ -231,10 +231,13 @@ export function sandboxUdsRuntimeAvailable(): boolean {
 }
 
 /** Pin sandbox-net peer IPs for --add-host (squid + optional relay services),
- *  mirroring run-sandbox.sh: peers that aren't running are skipped silently. */
+ *  mirroring run-sandbox.sh: peers that aren't running are skipped silently.
+ *  `lemonade` is the local-LLM relay (agent-sandbox setup/06); pinning it lets a
+ *  sandboxed opencode worker reach http://lemonade:13305 for `local/*` models, and
+ *  it lands in NO_PROXY (below) so that internal call skips squid. */
 export async function resolveSandboxHosts(): Promise<Record<string, string>> {
   const hosts: Record<string, string> = {};
-  for (const name of ['squid', 'service-a', 'service-b']) {
+  for (const name of ['squid', 'lemonade', 'service-a', 'service-b']) {
     const r = dockerOk(['inspect', '-f', `{{(index .NetworkSettings.Networks "${DEFAULT_NETWORK}").IPAddress}}`, name]);
     const ip = r.stdout.trim();
     if (r.status === 0 && /^\d+\.\d+\.\d+\.\d+$/.test(ip)) hosts[name] = ip;
