@@ -1,6 +1,6 @@
 import * as pty from 'node-pty';
-import type { WebContents } from 'electron';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { app, type WebContents } from 'electron';
+import { existsSync, readFileSync, statSync, appendFileSync, mkdirSync } from 'node:fs';
 import { delimiter, join, win32 } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ensureKilled, hardKillTree } from './procKill';
@@ -53,6 +53,23 @@ interface PtySession {
   /** Sandbox container behind this PTY's docker client, if any (see
    *  SpawnOptions.containerName) — kill paths must reap it alongside the client. */
   containerName?: string;
+  /** Rolling tail of recent output (ANSI-stripped, capped), flushed to a per-agent
+   *  log file on exit so a crash message survives the --rm container. */
+  tail?: string;
+}
+
+/** Strip ANSI/OSC escapes + CRs so the flushed log reads as plain text. */
+const ANSI_RE = /\x1b\[[0-9;?]*[a-zA-Z]|\x1b\][^\x07]*(?:\x07|\x1b\\)|\r/g;
+const AGENT_LOG_CAP = 16384;
+/** Persistent per-agent terminal log path under userData/agent-logs. The final
+ *  frames before an exit (incl. a crash message) land here so they can be read
+ *  after the container is gone — no more copy-pasting the last screen. */
+function agentLogPath(id: string): string | null {
+  try {
+    const dir = join(app.getPath('userData'), 'agent-logs');
+    mkdirSync(dir, { recursive: true });
+    return join(dir, `${id.replace(/[^A-Za-z0-9_.-]/g, '-')}.log`);
+  } catch { return null; }
 }
 
 export interface SpawnOptions {
@@ -683,6 +700,8 @@ export class PtyManager {
         if (this.sessions.get(opts.id) !== session) return;
         session.hasOutput = true;
         session.lastOutputAt = Date.now();
+        // Keep a capped, plain-text tail for the exit log (crash-message capture).
+        session.tail = ((session.tail ?? '') + String(data).replace(ANSI_RE, '')).slice(-AGENT_LOG_CAP);
         // Route to the session's owner window (multi-window owner routing).
         this.safeSend(`pty:data:${opts.id}`, data, session.owner);
       });
@@ -690,6 +709,15 @@ export class PtyManager {
         // Stale exit from a process whose id was reclaimed (kill()+respawn) — do
         // NOT touch the live session or tell the renderer the new pty died.
         if (this.sessions.get(opts.id) !== session) return;
+        // Flush the tail + exit code to the per-agent log so a crash message
+        // (e.g. a bad --resume, an auth failure) is readable after the fact.
+        try {
+          const p = agentLogPath(opts.id);
+          if (p) {
+            const stamp = `\n─ process exited (code ${exitCode}${signal ? `, signal ${signal}` : ''}) @ ${new Date().toISOString()} ─\n`;
+            appendFileSync(p, (session.tail ?? '') + stamp);
+          }
+        } catch { /* logging must never break the exit path */ }
         this.safeSend(`pty:exit:${opts.id}`, { exitCode, signal }, session.owner);
         this.sessions.delete(opts.id);
         // Natural exit must run the same lifecycle teardown as an explicit kill.

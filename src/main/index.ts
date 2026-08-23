@@ -2561,6 +2561,18 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
   // happens at the very end, after every provider/resume/model flag is assembled.
   const wantSandbox = opts.sandbox ?? opts.hive?.sandbox ?? readConfig().sandboxAgents === true;
   if (opts.hive) opts.hive = { ...opts.hive, sandbox: wantSandbox };
+  // Compute the per-agent sandbox home path NOW (before the resume block), under
+  // userData (not the harness home — see sandboxHomesRoot). It must exist and be
+  // credential-seeded here so the claude resume block below can seed the session
+  // transcript INTO it — otherwise a sandboxed `--resume` looks in the container
+  // home, finds nothing, and claude exits "No conversation found with session ID".
+  let sandboxHome: string | undefined;
+  if (wantSandbox) {
+    const safeSandboxId = opts.id.replace(/[^A-Za-z0-9_.-]/g, '-').slice(0, 80);
+    sandboxHome = join(sandboxHomesRoot(), safeSandboxId);
+    try { mkdirSync(sandboxHome, { recursive: true }); } catch { /* best-effort */ }
+    seedSandboxAgentHome(sandboxHome, opts.cwd, provider);
+  }
   // ── Missing engine CLI → run its installer visibly (pre-spawn) ───────────────
   // If the agent's engine binary (claude/codex/…) isn't installed, spawning it
   // just dies with "— process exited (code 1) —" and the user has no idea why.
@@ -2767,7 +2779,10 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
     const explicitSid = typeof opts.resumeSessionId === 'string' ? opts.resumeSessionId.trim() : '';
     const sid = explicitSid || (opts.resume === true ? hive.lastSession(opts.hive.id) : undefined);
     if (sid && !args.includes('--resume')) {
-      if (seedSessionTranscript(opts.cwd, sid)) {
+      // For a sandboxed agent, seed into its CONTAINER home so `--resume` resolves
+      // inside the sandbox; a host agent seeds into ~/.claude as before. Either way,
+      // only attach --resume when the transcript is actually present at the target.
+      if (seedSessionTranscript(opts.cwd, sid, sandboxHome)) {
         args.push('--resume', sid);
         didResume = true;
       } else if (explicitSid) {
@@ -2945,14 +2960,8 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
     if (hiveSock && !udsOk) {
       console.warn('[sandbox] hooks.sock cannot cross into gVisor without the runsc-uds runtime (agent-sandbox setup/05-uds-runtime.sh) — spawning confined WITHOUT the Stop-hook loop.');
     }
-    // Phase 2 — persistent per-agent container home (login/onboarding/transcripts/
-    // --resume), under userData (NOT the harness home — see sandboxHomesRoot).
-    // Seeded per engine: claude gets its credential+onboarding+trust, codex/gemini
-    // get the operator's OAuth home copied, API-key engines (opencode) get nothing.
-    const safeId = opts.id.replace(/[^A-Za-z0-9_.-]/g, '-').slice(0, 80);
-    const sandboxHome = join(sandboxHomesRoot(), safeId);
-    try { mkdirSync(sandboxHome, { recursive: true }); } catch { /* best-effort */ }
-    seedSandboxAgentHome(sandboxHome, opts.cwd, provider);
+    // sandboxHome was computed + credential-seeded earlier (before the resume
+    // block, which needed it to seed the session transcript into the container).
     // FAIL CLOSED: sandbox-net has no route out, so squid IS the only egress. If
     // its IP can't be resolved (squid down, or mid-restart at spawn time), the
     // container would come up with a proxy env pointing at an unreachable name

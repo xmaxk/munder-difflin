@@ -72,10 +72,18 @@ export function projectDir(cwd: string): string {
  *  crafted id like `../../x` would otherwise traverse out of the project dirs). */
 const VALID_SESSION_ID = /^[A-Za-z0-9_-]+$/;
 
-export function seedSessionTranscript(cwd: string, sessionId: string): boolean {
+export function seedSessionTranscript(cwd: string, sessionId: string, homeDir?: string): boolean {
   try {
     if (!sessionId || !VALID_SESSION_ID.test(sessionId)) return false;
-    const target = path.join(projectDir(cwd), `${sessionId}.jsonl`);
+    // A sandboxed agent runs claude in a container whose $HOME is `homeDir`, and
+    // claude reads transcripts from $HOME/.claude/projects — NOT the operator's
+    // ~/.claude. Seed into the CONTAINER home so `--resume` finds the session
+    // inside the sandbox; the source transcript is still read from the host below.
+    // (Without this the check passes on the host, but claude in the container sees
+    // no session and exits: "No conversation found with session ID …".)
+    const target = homeDir
+      ? path.join(homeDir, '.claude/projects', projectKey(cwd), `${sessionId}.jsonl`)
+      : path.join(projectDir(cwd), `${sessionId}.jsonl`);
     if (existsSync(target)) return true;
     const projectsRoot = path.join(os.homedir(), '.claude/projects');
     if (!existsSync(projectsRoot)) return false;
