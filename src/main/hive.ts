@@ -757,7 +757,7 @@ export class HiveManager {
           if (desc.kind === 'hooks') {
             if (desc.shim === 'agy') this.installAgyHooks();
             else if (desc.shim === 'codex') {
-              env.CODEX_HOME = this.installCodexHooks(dir, meta.sandbox === true);
+              env.CODEX_HOME = this.installCodexHooks(dir, meta.sandbox === true, meta.cwd);
               // Codex refuses to run hooks from a config dir without persisted
               // "hook trust" (normally an interactive gate). Our hooks.json is
               // hive-authored inside an isolated CODEX_HOME, so we bypass that gate
@@ -1881,7 +1881,7 @@ export class HiveManager {
    *  untouched. The user's ~/.codex/auth.json is linked in and their config.toml is
    *  copied + extended (login + model/provider/trust settings still apply).
    *  Returns the CODEX_HOME path for the caller to put in the worker's env. */
-  private installCodexHooks(dir: string, sandboxed = false): string {
+  private installCodexHooks(dir: string, sandboxed = false, cwd?: string): string {
     const home = join(dir, '.codex');
     try {
       mkdirSync(home, { recursive: true });
@@ -1959,6 +1959,13 @@ export class HiveManager {
         for (const ev of events) {
           config += `\n[[hooks.${ev}]]\n[[hooks.${ev}.hooks]]\ntype = "command"\ncommand = '${hookCmd}'\ntimeout = 30\n`;
         }
+      }
+      // codex 0.149.0 shows an interactive "Do you trust this directory?" prompt on
+      // first entry to a cwd — the bypass flag does NOT cover it, so a hive worker
+      // hangs on it (no human to press 1). Pre-trust the worker's cwd in the config
+      // so project-local config/hooks load and codex proceeds straight to the task.
+      if (cwd) {
+        config += `\n[projects.${JSON.stringify(cwd)}]\ntrust_level = "trusted"\n`;
       }
       writeFileSync(join(home, 'config.toml'), config, 'utf8');
     } catch (e) { console.error('[hive] installCodexHooks failed:', e); }
