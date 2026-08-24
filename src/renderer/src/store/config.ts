@@ -65,6 +65,11 @@ export interface HarnessConfig {
   /** May the orchestrator ("Michael") spin up agents on its own? Default FALSE,
    *  so an absent value reads as off. Mirrors src/main/config.ts. */
   orchestratorMaySpawn?: boolean;
+  /** Run every spawned agent inside the gVisor/Docker sandbox. Mirrors
+   *  src/main/config.ts; read renderer-side to skip boot steps a sandboxed agent
+   *  can't perform (e.g. Remote Control, which needs a full-scope login the
+   *  sandbox's setup-token lacks). */
+  sandboxAgents?: boolean;
   defaultCommand: string;
   /** Default model for newly spawned agents (e.g. 'claude-sonnet-4-6[1m]'); unset = CLI default. */
   defaultModel?: string;

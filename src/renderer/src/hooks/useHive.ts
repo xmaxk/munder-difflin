@@ -437,7 +437,17 @@ export function useHive(config: HarnessConfig | null): void {
       bootGraceUntil.current[GOD_ID] = Date.now() + BOOT_GRACE_MS;
       void (async () => {
         try {
-          const remoteCommand = remoteControlCommandForProvider(godProvider, 'Michael');
+          // A sandboxed god authenticates with a long-lived setup-token, which CANNOT
+          // establish Remote Control (RC needs a full-scope interactive login). Typing
+          // /remote-control then only prints a "requires a full-scope login token" error
+          // into his TUI — and worse, on a RESUMED boot (restore-on-restart) that failing
+          // command is the ONLY thing typed (the orientation kick below is skipped for a
+          // resumed god), leaving him parked on the error instead of draining his inbox.
+          // Skip RC entirely when sandboxed so his boot ends clean and the inbox-wake
+          // nudge can drive him.
+          const remoteCommand = config?.sandboxAgents
+            ? null
+            : remoteControlCommandForProvider(godProvider, 'Michael');
           if (remoteCommand) {
             // settleMs pauses the chain ~1.5s after /remote-control before the
             // orientation prompt (fresh spawns only) is submitted next.
