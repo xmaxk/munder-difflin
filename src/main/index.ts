@@ -524,6 +524,30 @@ function informGod(subject: string, body: string, slack?: { channel: string; thr
   }
 }
 
+/** Post a terminal `act:"done"` to god ON A WORKER'S BEHALF. A weaker model
+ *  (seen with a small local model over opencode) sometimes FINISHES the objective
+ *  but never emits the completion message the dispatch asks for, which would leave
+ *  god waiting forever on that worker's per-agent `done` and hang the whole round.
+ *  Called from the reap paths so god's "wait for all N" always closes regardless of
+ *  model capability. Posted as the worker (from: workerId) so god's done-tracking —
+ *  which keys on the sender — counts it. The body states plainly that the worker was
+ *  REAPED (not a clean self-signaled success) and that the output must be verified,
+ *  so a synthesized done is never mistaken for a trustworthy result. The parallel
+ *  informGod() still fires with the human-readable reason (and any Slack coords). */
+function postWorkerDoneOnBehalf(workerId: string, reqId: string, name: string, reason: string): void {
+  try {
+    hive.send({
+      to: 'god',
+      conversation: `worker-${reqId}`,
+      act: 'done',
+      subject: `${name} — reaped (${reason})`,
+      body: `[HARNESS-SYNTHESIZED DONE] Worker ${workerId} was reaped (${reason}) and never posted its own completion message, so the harness is closing its task on its behalf. Its objective may be incomplete — VERIFY its output/branch before trusting it; do NOT treat this as a clean success.`
+    }, workerId);
+  } catch (e) {
+    console.error('[worker] postWorkerDoneOnBehalf failed:', e);
+  }
+}
+
 /** Gated worktree teardown for an ephemeral worker: remove it ONLY when it holds no
  *  unintegrated work; otherwise leave it (and its branch) in place and ping god, the
  *  sole integrator. Async + best-effort; on any uncertainty it KEEPS the worktree
@@ -4725,10 +4749,16 @@ async function processSpawnRequest(filePath: string): Promise<void> {
   // reply command + autonomy policy. `from: god` so the worker treats it as a god
   // dispatch per its protocol.
   try {
+    // The absolute directory the CLI actually runs in (a worktree when isolated,
+    // else the plain cwd). Stated explicitly in the dispatch because weaker models
+    // otherwise resolve "current working directory" to their agent/hive dir (where
+    // their inbox/outbox live) and drop deliverables there instead of the project —
+    // an opencode/local-30B failure traced live: correct file, wrong directory.
+    const workDir = res.worktreePath ?? cwd;
     const prefix = slack
       ? buildAutonomousRequestProtocol(slack.channel, slack.thread_ts, slackReplyScriptPath())
       : '[AUTONOMOUS WORKER TASK — no interactive human is watching. Work autonomously; do not ask interactive questions.] The task starts now: ';
-    const suffix = `\n\n[CAPABILITIES] Before you start, consult your capability catalog — run the \`/capabilities\` skill (or read \`$AGENT_DIR/.claude/skills/capabilities/SKILL.md\`). It lists your temporal date-range skills (\`/today\`, \`/last30Days\`, \`/lastQuarter\`, …) and the integrations available to you (reached via the loopback broker) and how to call each. For any time-scoped work, resolve the dates with those skills instead of computing them by hand.\n\n[WORKER COMPLETION] When finished, signal done by sending ONE outbox message to god with "act":"done" and a short result summary — that releases this ephemeral worker (terminal closed; your branch is handed to god). Do NOT push to any remote; god is the sole integrator.`;
+    const suffix = `\n\n[WORKING DIRECTORY] Your working directory is ${workDir}. Create, edit, and save ALL deliverables there — write files to ${workDir}/<filename> using that absolute path (a bare relative name may resolve elsewhere). Do NOT write deliverables into your agent/hive directory ($AGENT_DIR); that folder holds only your inbox, outbox, and memory. Whenever the task says "current working directory" or "cwd", it means ${workDir}.\n\n[CAPABILITIES] Before you start, consult your capability catalog — run the \`/capabilities\` skill (or read \`$AGENT_DIR/.claude/skills/capabilities/SKILL.md\`). It lists your temporal date-range skills (\`/today\`, \`/last30Days\`, \`/lastQuarter\`, …) and the integrations available to you (reached via the loopback broker) and how to call each. For any time-scoped work, resolve the dates with those skills instead of computing them by hand.\n\n[WORKER COMPLETION] When finished, signal done by sending ONE outbox message to god with "act":"done" and a short result summary — that releases this ephemeral worker (terminal closed; your branch is handed to god). Do NOT push to any remote; god is the sole integrator.`;
     hive.send({ to: workerId, conversation: `worker-${reqId}`, act: 'request', subject: meta.name, body: `${prefix}${objective}${suffix}` }, 'god');
   } catch (e) {
     console.error('[worker] dispatch send failed:', e);
@@ -4840,6 +4870,7 @@ async function ephemeralWorkerTick(): Promise<void> {
             `Worker ${workerId} used ${used.toLocaleString()} tokens (> its cap of ${tokenCap.toLocaleString()}) and was reaped. Any committed work on its branch is preserved for you.`,
             rec.slack
           );
+          postWorkerDoneOnBehalf(workerId, rec.reqId, rec.name ?? workerId, 'token cap exceeded');
           ptyManager.kill(workerId);
           teardownPty(workerId);
           continue;
@@ -4855,6 +4886,7 @@ async function ephemeralWorkerTick(): Promise<void> {
           `Worker ${workerId} produced no output for ${Math.round(idleMs / 60000)} min (> the ${Math.round(idleTimeoutMs / 60000)} min cap) and never signaled done, so it was reaped. Any committed work on its branch is preserved for you.`,
           rec.slack
         );
+        postWorkerDoneOnBehalf(workerId, rec.reqId, rec.name ?? workerId, `${Math.round(idleMs / 60000)}min idle`);
         ptyManager.kill(workerId);
         teardownPty(workerId);
       }
