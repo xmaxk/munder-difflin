@@ -2723,8 +2723,15 @@ module.exports.default = module.exports;
 // renderer idle inbox-wake nudge delivers mail. ESM (OpenCode runs on Bun). Fully
 // wrapped. LIVE-UNVERIFIED (plugin auto-load + session.idle firing need BYOK keys).
 const OPENCODE_PLUGIN = `import { createConnection } from 'node:net';
+import { writeFileSync, mkdirSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 const SOCK = process.env.HIVE_SOCK;
 const AGENT = process.env.AGENT_ID || null;
+const AGENT_DIR = process.env.AGENT_DIR || null;
+// Ephemeral hive workers are spawned with id "worker-<reqId>"; ONLY they may
+// auto-release on idle (a persistent agent must not "finish" after every turn).
+const IS_WORKER = !!AGENT && AGENT.indexOf('worker-') === 0;
+let didWork = false, doneSent = false;
 function post(payload) {
   try {
     if (!SOCK) return;
@@ -2733,16 +2740,57 @@ function post(payload) {
     c.on('error', () => {});
   } catch (e) {}
 }
+// Auto-signal completion when an ephemeral worker's session goes idle after doing
+// work — so a weaker model that finishes the objective but never writes its own
+// "done" still releases PROMPTLY (like the stronger models, which exit in seconds),
+// instead of lingering on the floor until the minutes-long idle reaper. Writes a
+// real act:"done" into the worker's outbox; the floor's done-scan reaps it. Guarded
+// to fire at most once and only after >=1 tool ran (never at a pre-work boot idle).
+function sendWorkerDone() {
+  try {
+    if (!IS_WORKER || !AGENT_DIR || doneSent || !didWork) return;
+    doneSent = true;
+    const outdir = join(AGENT_DIR, 'outbox');
+    // Cross-instance dedupe: the plugin file is installed under BOTH plugin/ and
+    // plugins/ (which dir opencode scans varies by build), so two module instances
+    // can each fire once — the in-memory doneSent flag can't see across them. The
+    // outbox itself is the shared state: if an idle-done already exists (pending or
+    // routed to .sent), another instance beat us; do nothing.
+    try {
+      for (const d of [outdir, join(outdir, '.sent')]) {
+        for (const f of readdirSync(d)) {
+          if (f.indexOf('-idle-done') !== -1) return;
+        }
+      }
+    } catch (e) {}
+    const now = new Date().toISOString();
+    const id = now.replace(/[:.]/g, '-') + '-idle-done';
+    const msg = {
+      id: id, from: AGENT, to: 'god', act: 'done', conversation: 'worker-' + AGENT,
+      subject: 'Session idle — releasing (deliverables UNVERIFIED)',
+      body: 'AUTO-SIGNALED by the opencode hive plugin: this session went idle after running at least one tool, and the model did not post its own done. This message only means the worker STOPPED — it does NOT confirm the objective was met or that any deliverable was written. VERIFY the expected output in the working directory before counting this task complete.',
+      created_at: now, hops: 0, requires_reply: false, needs_human: false
+    };
+    const outbox = join(AGENT_DIR, 'outbox');
+    mkdirSync(outbox, { recursive: true });
+    writeFileSync(join(outbox, id + '.json'), JSON.stringify(msg));
+  } catch (e) {}
+}
 export const HiveBridge = async () => {
   return {
     event: async (input) => {
-      try { if (input && input.event && input.event.type === 'session.idle') post({ hook_event_name: 'Stop' }); } catch (e) {}
+      try {
+        if (input && input.event && input.event.type === 'session.idle') {
+          post({ hook_event_name: 'Stop' });
+          sendWorkerDone();
+        }
+      } catch (e) {}
     },
     'tool.execute.before': async (input) => {
       try { post({ hook_event_name: 'PreToolUse', tool_name: input && (input.tool || input.name) }); } catch (e) {}
     },
     'tool.execute.after': async (input) => {
-      try { post({ hook_event_name: 'PostToolUse', tool_name: input && (input.tool || input.name) }); } catch (e) {}
+      try { didWork = true; post({ hook_event_name: 'PostToolUse', tool_name: input && (input.tool || input.name) }); } catch (e) {}
     }
   };
 };
