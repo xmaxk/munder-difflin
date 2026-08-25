@@ -73,6 +73,10 @@ const ENV_PASSTHROUGH = [
   // Hive identity (paths are parity-mounted, so the values stay correct inside).
   'AGENT_ID', 'AGENT_NAME', 'HIVE_ROOT', 'AGENT_DIR', 'HIVE_NODE',
   'MD_BROKER_SOCKET', 'MD_BROKER_TOKEN_FILE',
+  // OTLP telemetry → the collector on the sandbox-net gateway (gaps-plan gap E).
+  'CLAUDE_CODE_ENABLE_TELEMETRY', 'OTEL_METRICS_EXPORTER', 'OTEL_LOGS_EXPORTER',
+  'OTEL_EXPORTER_OTLP_PROTOCOL', 'OTEL_EXPORTER_OTLP_ENDPOINT',
+  'OTEL_METRIC_EXPORT_INTERVAL', 'OTEL_LOGS_EXPORT_INTERVAL', 'OTEL_RESOURCE_ATTRIBUTES',
   // Terminal/locale hints the TUIs read.
   'TERM', 'LANG', 'LC_CTYPE', 'COLORTERM', 'FORCE_COLOR', 'COLORFGBG',
   // The ONE scoped credential spawnAgentCore computed for this engine.
@@ -169,7 +173,12 @@ export function buildSandboxArgs(input: SandboxSpawnInput): { command: string; a
   for (const k of ['HTTPS_PROXY', 'HTTP_PROXY', 'https_proxy', 'http_proxy']) {
     args.push('-e', `${k}=${proxy}`);
   }
-  args.push('-e', `NO_PROXY=localhost,127.0.0.1,${Object.keys(input.addHosts).join(',') || 'squid'}`);
+  // NO_PROXY: never send loopback, the pinned service hostnames, or the OTLP
+  // collector (a raw gateway IP on the internal net) through squid.
+  const noProxy = ['localhost', '127.0.0.1', ...Object.keys(input.addHosts)];
+  const otlp = input.env.OTEL_EXPORTER_OTLP_ENDPOINT;
+  if (otlp) { try { noProxy.push(new URL(otlp).hostname); } catch { /* ignore */ } }
+  args.push('-e', `NO_PROXY=${noProxy.join(',') || 'squid'}`);
   // Unambiguous "you are inside the agent sandbox" marker. The hive-node shim
   // keys on it (fall back to PATH node even if a host Electron path happens to
   // be visible through a mount), and future in-container tooling can too.

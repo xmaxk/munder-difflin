@@ -198,6 +198,13 @@ export interface HarnessConfig {
   sandboxAgents: boolean;
   /** Container image sandboxed agents run in (must carry the engine CLIs). */
   sandboxImage?: string;
+  /** sandbox-net gateway IP (host side of the internal bridge). When
+   *  sandboxAgents is on, the OTLP telemetry collector binds here so
+   *  containers can reach it (127.0.0.1 is unreachable from a container).
+   *  Matches agent-sandbox setup/03's pinned subnet. Default '172.19.0.1'. */
+  sandboxNetGateway?: string;
+  /** Fixed port for the sandbox-facing OTLP collector bind (gap E). Default 4319. */
+  sandboxTelemetryPort?: number;
   /** May the orchestrator ("Michael") spin up agents on its own?
    *
    *  Default FALSE. Spawning an agent is a SPEND decision, so it should not

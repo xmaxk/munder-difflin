@@ -128,8 +128,8 @@ export interface TelemetryCollectorOptions {
 export class TelemetryCollector {
   private server: Server | null = null;
   private boundPort: number | null = null;
-  private readonly host: string;
-  private readonly port: number;
+  private host: string;
+  private port: number;
   private readonly emit?: (channel: string, payload: unknown) => void;
   private readonly resolveCwd?: (agentId: string) => string | null;
   private readonly resolveSessionId?: (agentId: string) => string | undefined;
@@ -154,9 +154,17 @@ export class TelemetryCollector {
     this.resolveSessionId = opts.resolveSessionId;
   }
 
-  /** Bind the loopback OTLP listener. The handler is live the instant this
-   *  resolves; `endpoint()` then returns the URL to inject into agent env. */
-  async start(): Promise<{ ok: boolean; endpoint?: string; error?: string }> {
+  /** Bind the OTLP listener. The handler is live the instant this resolves;
+   *  `endpoint()` then returns the URL to inject into agent env.
+   *
+   *  `bind` overrides the constructor's host/port — used to move the listener
+   *  off loopback onto the sandbox-net GATEWAY IP (172.19.0.1) when all agents
+   *  are containerized, since a container cannot reach the host's 127.0.0.1.
+   *  The gateway IP is a specific bridge interface (NOT 0.0.0.0) reachable only
+   *  by sandbox-net members, and a FIXED port so the endpoint is stable. */
+  async start(bind?: { host?: string; port?: number }): Promise<{ ok: boolean; endpoint?: string; error?: string }> {
+    if (bind?.host) this.host = bind.host;
+    if (typeof bind?.port === 'number') this.port = bind.port;
     if (this.server) return { ok: true, endpoint: this.endpoint() ?? undefined };
     try {
       await this.listen();

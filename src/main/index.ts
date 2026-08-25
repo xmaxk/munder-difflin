@@ -5089,7 +5089,17 @@ function bootstrapHiveServices(): void {
   // the hive at it so every subsequent spawn is instrumented. Best-effort — a bind
   // failure just leaves telemetry off (transcript reconciler stays). No breaker.start():
   // the breaker is POLICY-only, ticked by the heartbeat beat (#1, ships disabled).
-  void telemetry.start().then((r) => {
+  // When agents are sandboxed they cannot reach the host's 127.0.0.1, so bind the
+  // OTLP collector on the sandbox-net GATEWAY IP at a fixed port (gaps-plan gap E).
+  // Empirically reachable from a runsc container, scoped to that bridge interface
+  // (not 0.0.0.0), and NOT reachable from the internal net's outside — so fleet
+  // telemetry finally flows without a dual-homed relay. Spoofing of agent.id is
+  // accepted for this single-operator rig (documented in THREAT-MODEL.md).
+  const _tcfg = readConfig();
+  const _otelBind = _tcfg.sandboxAgents
+    ? { host: _tcfg.sandboxNetGateway ?? '172.19.0.1', port: _tcfg.sandboxTelemetryPort ?? 4319 }
+    : undefined;
+  void telemetry.start(_otelBind).then((r) => {
     if (r.ok && r.endpoint) { hive.setOtelEndpoint(r.endpoint); console.log('[telemetry] collector listening', r.endpoint); }
     else console.error('[telemetry] collector failed to start:', r.error);
   });
