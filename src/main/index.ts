@@ -3001,7 +3001,12 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
     // agent is still fully confined without it — it just won't drain its inbox
     // autonomously until the operator registers the runtime.
     const hiveSock = opts.env?.HIVE_SOCK;
-    const udsOk = hiveSock ? sandboxUdsRuntimeAvailable() : false;
+    // runsc-uds is the STANDARD agent runtime whenever it is registered (Phase 1
+    // of the gaps plan): the per-agent UDS secret broker requires it, and its
+    // only delta vs plain runsc is --host-uds=open (connect-only — least
+    // privilege). Plain runsc remains the fallback so an unregistered runtime
+    // degrades instead of failing.
+    const udsOk = sandboxUdsRuntimeAvailable();
     if (hiveSock && !udsOk) {
       console.warn('[sandbox] hooks.sock cannot cross into gVisor without the runsc-uds runtime (agent-sandbox setup/05-uds-runtime.sh) — spawning confined WITHOUT the Stop-hook loop.');
     }
@@ -3030,7 +3035,8 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
       // God profile: its cwd IS the harness home (contains the hive) and it is the
       // hive scribe, so it needs the hive writable — not the worker's ro boundary.
       ...(opts.hive?.isGod ? { hiveWritable: true } : {}),
-      ...(hiveSock && udsOk ? { hiveSock, runtime: 'runsc-uds' } : {})
+      ...(udsOk ? { runtime: 'runsc-uds' } : {}),
+      ...(hiveSock && udsOk ? { hiveSock } : {})
     });
     // Respawn-in-place reuses the pty id → the deterministic name can collide
     // with a stale container (a wedged client leaves one behind). Sweep first.

@@ -158,6 +158,10 @@ export function buildSandboxArgs(input: SandboxSpawnInput): { command: string; a
     args.push('-e', `${k}=${proxy}`);
   }
   args.push('-e', `NO_PROXY=localhost,127.0.0.1,${Object.keys(input.addHosts).join(',') || 'squid'}`);
+  // Unambiguous "you are inside the agent sandbox" marker. The hive-node shim
+  // keys on it (fall back to PATH node even if a host Electron path happens to
+  // be visible through a mount), and future in-container tooling can too.
+  args.push('-e', 'MD_SANDBOX=1');
   args.push(input.image, input.command, ...input.args);
   return { command: 'docker', args, containerName };
 }

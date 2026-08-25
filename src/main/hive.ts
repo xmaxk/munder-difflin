@@ -414,7 +414,15 @@ export class HiveManager {
       if (process.platform === 'win32') {
         writeFileSync(p, `@echo off\r\nset ELECTRON_RUN_AS_NODE=1\r\n"${process.execPath}" %*\r\n`, 'utf8');
       } else {
-        writeFileSync(p, `#!/bin/sh\nELECTRON_RUN_AS_NODE=1 exec "${process.execPath}" "$@"\n`, 'utf8');
+        // PORTABLE shim: the same file must work on the host AND inside a
+        // sandboxed agent container, because its parity path is baked into
+        // agent-facing text (nodeCommand() → prompts, Slack reply commands)
+        // and rides the ro hive mount into every container. In a container
+        // the host Electron binary is absent (or must not be used — MD_SANDBOX
+        // guards the corner case where an agent's cwd mount happens to contain
+        // it), so fall through to the image's real `node` on PATH. exec-only,
+        // argv passed through untouched — no eval, no word-splitting.
+        writeFileSync(p, `#!/bin/sh\nif [ -z "\${MD_SANDBOX:-}" ] && [ -x "${process.execPath}" ]; then\n  ELECTRON_RUN_AS_NODE=1 exec "${process.execPath}" "$@"\nfi\nexec node "$@"\n`, 'utf8');
         chmodSync(p, 0o755);
       }
     } catch (e) {
@@ -702,7 +710,12 @@ export class HiveManager {
     // A sandboxed agent has no host Electron: the hive-node launcher execs a
     // binary that does not exist inside the container, while the sandbox image
     // guarantees plain `node` on PATH.
-    env.HIVE_NODE = meta.sandbox ? 'node' : this.nodeCommand();
+    // The hive-node shim is now PORTABLE (falls back to PATH `node` when the
+    // host Electron is absent or MD_SANDBOX is set), and its parity path rides
+    // the ro hive mount into every container — so sandboxed agents get the same
+    // absolute command as host agents, and every prompt that bakes
+    // nodeCommand() (Slack replies, KG line) is finally true on both sides.
+    env.HIVE_NODE = this.nodeCommand();
     // Generic light/dark hint for TUIs that paint their own background. The app
     // defaults to light but every agent CLI assumed a dark terminal, so Crush and
     // OpenCode looked pasted into a light window. COLORFGBG is the classic
