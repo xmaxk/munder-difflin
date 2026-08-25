@@ -72,6 +72,7 @@ const DEFAULT_NETWORK = 'sandbox-net';
 const ENV_PASSTHROUGH = [
   // Hive identity (paths are parity-mounted, so the values stay correct inside).
   'AGENT_ID', 'AGENT_NAME', 'HIVE_ROOT', 'AGENT_DIR', 'HIVE_NODE',
+  'MD_BROKER_SOCKET', 'MD_BROKER_TOKEN_FILE',
   // Terminal/locale hints the TUIs read.
   'TERM', 'LANG', 'LC_CTYPE', 'COLORTERM', 'FORCE_COLOR', 'COLORFGBG',
   // The ONE scoped credential spawnAgentCore computed for this engine.
@@ -148,6 +149,17 @@ export function buildSandboxArgs(input: SandboxSpawnInput): { command: string; a
   // the mounted hive root; anywhere else it would dangle unreachable.
   if (input.hiveSock && hiveRoot && input.hiveSock.startsWith(`${hiveRoot}/`)) {
     args.push('-e', `HIVE_SOCK=${input.hiveSock}`);
+  }
+  // ── Per-agent broker socket (phase-2 gaps plan): mount the socket's PARENT
+  // DIRECTORY read-only at its parity path — never the socket file itself (a
+  // file mount pins the inode; a broker rebind would strand the container on a
+  // dead socket). The dir holds broker.sock + the 0600 .token file and is
+  // created per-run with a nonce, so this mount is the ONLY way any container
+  // can reach — or even name — this worker's endpoint. Requires runsc-uds.
+  const brokerSock = input.env.MD_BROKER_SOCKET;
+  if (brokerSock && brokerSock.startsWith('/') && brokerSock.includes('/')) {
+    const sockDir = brokerSock.slice(0, brokerSock.lastIndexOf('/'));
+    args.push('-v', `${sockDir}:${sockDir}:ro`);
   }
   // ── Env from ZERO: the allowlist + the proxy posture. Nothing inherited.
   for (const key of ENV_PASSTHROUGH) {

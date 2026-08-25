@@ -26,6 +26,8 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { Readable } from 'node:stream';
+import { mkdirSync, writeFileSync, unlinkSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   type IntegrationRecord,
   buildAuthHeaders,
@@ -79,6 +81,10 @@ export class IntegrationBroker {
   private readonly byToken = new Map<string, Capability>();
   /** workerId -> token, for revoke. */
   private readonly byWorker = new Map<string, string>();
+  /** workerId -> its per-agent UDS endpoint (sandboxed workers only). The socket
+   *  PATH is the identity: each server serves exactly one worker, and its parent
+   *  dir is the only thing mounted into that worker's container. */
+  private readonly udsByWorker = new Map<string, { server: Server; dir: string; sockPath: string }>();
 
   constructor(deps: IntegrationBrokerDeps) {
     this.deps = deps;
@@ -109,6 +115,7 @@ export class IntegrationBroker {
     try { this.server?.close(); } catch { /* noop */ }
     this.server = null;
     this.port = 0;
+    for (const id of [...this.udsByWorker.keys()]) this.revoke(id);
     this.byToken.clear();
     this.byWorker.clear();
   }
@@ -134,10 +141,76 @@ export class IntegrationBroker {
     return token;
   }
 
-  /** Revoke a worker's capability (called on teardown). Idempotent. */
+  /** Revoke a worker's capability (called on teardown). Idempotent. Also tears
+   *  down the worker's UDS endpoint and deletes its socket dir (which holds the
+   *  0600 token file), so nothing of the grant outlives the worker. */
   revoke(workerId: string): void {
     const token = this.byWorker.get(workerId);
     if (token) { this.byToken.delete(token); this.byWorker.delete(workerId); }
+    const uds = this.udsByWorker.get(workerId);
+    if (uds) {
+      this.udsByWorker.delete(workerId);
+      try { uds.server.close(); } catch { /* noop */ }
+      try { rmSync(uds.dir, { recursive: true, force: true }); } catch { /* noop */ }
+    }
+  }
+
+  /** Mint a per-worker capability delivered as a PER-AGENT UNIX SOCKET — the
+   *  sandboxed variant of grant(). Creates <socksRoot>/<workerId>-<nonce>/ (0700)
+   *  containing broker.sock and a 0600 `.token` file; the caller mounts ONLY that
+   *  directory (read-only) into the worker's container, so the socket is an
+   *  unforgeable capability: no other agent can even name it. gVisor notes: the
+   *  container must run under runsc-uds (--host-uds=open, connect-only); the
+   *  PARENT DIR is what gets mounted (a socket-file mount pins the inode across
+   *  rebinds); SO_PEERCRED is useless across the gofer, which is exactly why
+   *  identity is the socket path, enforced server-side per request. Any prior
+   *  grant for this worker is revoked first (fresh nonce dir per run — no
+   *  authority inheritance across runs). Returns null on failure (caller
+   *  degrades: worker simply has no broker). */
+  async grantUds(workerId: string, allowedIds: string[], socksRoot: string):
+      Promise<{ token: string; sockPath: string; tokenFile: string } | null> {
+    this.revoke(workerId);
+    const token = randomBytes(32).toString('base64url');
+    const nonce = randomBytes(6).toString('hex');
+    const dir = join(socksRoot, `${workerId.replace(/[^A-Za-z0-9._-]/g, '-')}-${nonce}`);
+    const sockPath = join(dir, 'broker.sock');
+    const tokenFile = join(dir, '.token');
+    try {
+      mkdirSync(dir, { recursive: true, mode: 0o700 });
+      try { unlinkSync(sockPath); } catch { /* fresh dir — none expected */ }
+      writeFileSync(tokenFile, token, { mode: 0o600 });
+    } catch (e) {
+      console.error('[broker] grantUds fs setup failed:', e);
+      return null;
+    }
+    const server = createServer((req, res) => this.handleUds(workerId, req, res));
+    const ok = await new Promise<boolean>((resolve) => {
+      server.once('error', (e) => { console.error('[broker] uds listen failed:', e); resolve(false); });
+      server.listen(sockPath, () => resolve(true));
+    });
+    if (!ok) {
+      try { rmSync(dir, { recursive: true, force: true }); } catch { /* noop */ }
+      return null;
+    }
+    this.byToken.set(token, { workerId, allowedIds: new Set(allowedIds), grantedAt: Date.now() });
+    this.byWorker.set(workerId, token);
+    this.udsByWorker.set(workerId, { server, dir, sockPath });
+    return { token, sockPath, tokenFile };
+  }
+
+  /** Request handler for a per-agent UDS endpoint. No loopback check (a UDS peer
+   *  has no remoteAddress — the mount scoping IS the reachability control), but
+   *  BOTH factors are still enforced: the presented token must resolve AND must
+   *  belong to the worker this socket was created for — a token exfiltrated to
+   *  another agent is useless on any other socket, and another agent's token is
+   *  useless here. */
+  private handleUds(ownerWorkerId: string, req: IncomingMessage, res: ServerResponse): void {
+    const cap = this.resolveCapability(IntegrationBroker.tokenFrom(req));
+    if (!cap) return IntegrationBroker.sendError(res, 401, 'unauthorized', 'missing or invalid capability token');
+    if (cap.workerId !== ownerWorkerId) {
+      return IntegrationBroker.sendError(res, 403, 'forbidden', 'token does not match this endpoint');
+    }
+    this.route(cap, req, res);
   }
 
   /** Constant-time-ish lookup of a presented token against live capabilities. */
@@ -178,6 +251,12 @@ export class IntegrationBroker {
     const cap = this.resolveCapability(IntegrationBroker.tokenFrom(req));
     if (!cap) return IntegrationBroker.sendError(res, 401, 'unauthorized', 'missing or invalid capability token');
 
+    this.route(cap, req, res);
+  }
+
+  /** Post-authentication request routing, shared by the loopback handler and the
+   *  per-agent UDS handlers. */
+  private route(cap: Capability, req: IncomingMessage, res: ServerResponse): void {
     // 3) Parse /i/<integrationId>/<path...>.
     const rawUrl = req.url ?? '';
     const m = /^\/i\/([^/?#]+)(?:\/([^?#]*))?(\?[^#]*)?$/.exec(rawUrl);

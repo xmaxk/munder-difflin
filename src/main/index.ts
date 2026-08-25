@@ -4704,9 +4704,22 @@ async function processSpawnRequest(filePath: string): Promise<void> {
   // is up; the grant is revoked in teardownPty (and below if the spawn fails).
   const brokerEnv: Record<string, string> = {};
   if (integrationBroker.running()) {
-    const token = integrationBroker.grant(workerId, integrations.enabledIds());
-    brokerEnv.MD_BROKER_URL = integrationBroker.url();
-    brokerEnv.MD_BROKER_TOKEN = token;
+    if (cfgSpawn.sandboxAgents) {
+      // Sandboxed worker: capability = a per-agent UNIX socket (host loopback is
+      // unreachable from a container, and the broker's never-routable invariant
+      // holds). The socket's parent dir is mounted ro by buildSandboxArgs (keyed
+      // off MD_BROKER_SOCKET); the token rides a 0600 file in that dir, NOT env.
+      const g = await integrationBroker.grantUds(
+        workerId, integrations.enabledIds(), join(app.getPath('userData'), 'broker-socks'));
+      if (g) {
+        brokerEnv.MD_BROKER_SOCKET = g.sockPath;
+        brokerEnv.MD_BROKER_TOKEN_FILE = g.tokenFile;
+      }
+    } else {
+      const token = integrationBroker.grant(workerId, integrations.enabledIds());
+      brokerEnv.MD_BROKER_URL = integrationBroker.url();
+      brokerEnv.MD_BROKER_TOKEN = token;
+    }
   }
   const spawnOpts: AgentSpawnOptions = {
     id: workerId, cwd, command: bin, cols: 120, rows: 32,
@@ -5055,6 +5068,10 @@ function bootstrapHiveServices(): void {
   startEphemeralWorkerWatcher(); // poll HIVE_ROOT/spawn-requests → ephemeral workers
   // Phase 2: the loopback secret broker. Bind it BEFORE workers spawn so each spawn can
   // be granted a capability token + the broker URL in its env. Loopback-only, idempotent.
+  // Startup reconciliation (gaps-plan #31): a hard crash leaves per-agent UDS socket
+  // dirs (each holds a 0600 token) under broker-socks/. No grant is live at boot, so
+  // wipe the whole tree — every dir is a stale artifact of a previous run.
+  try { rmSync(join(app.getPath('userData'), 'broker-socks'), { recursive: true, force: true }); } catch { /* noop */ }
   void integrationBroker.start().then((r) => {
     if (r.ok) console.log('[broker] integration broker listening on', integrationBroker.url());
     else console.error('[broker] failed to start:', r.error);
