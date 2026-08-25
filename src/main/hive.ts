@@ -188,6 +188,34 @@ export interface SpawnInjection {
 
 const HOP_CAP = 12;
 
+/** gap D — map a default-MCP package-runner invocation to the immutable binary the
+ *  eval-sandbox image pre-installs (agent-sandbox/sandbox/Dockerfile step 7b). npm
+ *  servers land on the system PATH; uv servers at an absolute /opt/uv/bin path
+ *  (agent CLIs may spawn with a stripped PATH). Returns null for an unrecognized
+ *  package (keep the original spec — fail loudly, never silently swap). */
+const SANDBOX_MCP_BIN: Record<string, string> = {
+  '@modelcontextprotocol/server-sequential-thinking': 'mcp-server-sequential-thinking',
+  '@modelcontextprotocol/server-filesystem': 'mcp-server-filesystem',
+  '@upstash/context7-mcp': 'context7-mcp',
+  'mcp-server-time': '/opt/uv/bin/mcp-server-time',
+  'mcp-server-fetch': '/opt/uv/bin/mcp-server-fetch',
+  'mcp-server-git': '/opt/uv/bin/mcp-server-git'
+};
+function rewriteMcpForSandbox(command: string, args: string[]): { command: string; args: string[] } | null {
+  // npx -y <pkg> [rest...]  → <bin> [rest...]
+  if (command === 'npx') {
+    const i = args[0] === '-y' || args[0] === '--yes' ? 1 : 0;
+    const bin = SANDBOX_MCP_BIN[args[i]];
+    return bin ? { command: bin, args: args.slice(i + 1) } : null;
+  }
+  // uvx <pkg> [rest...]  → <bin> [rest...]
+  if (command === 'uvx') {
+    const bin = SANDBOX_MCP_BIN[args[0]];
+    return bin ? { command: bin, args: args.slice(1) } : null;
+  }
+  return null;
+}
+
 function sleepSync(ms: number): void {
   const sab = new SharedArrayBuffer(4);
   Atomics.wait(new Int32Array(sab), 0, 0, ms);
@@ -1067,7 +1095,7 @@ export class HiveManager {
       ...(matcher ? { matcher } : {}),
       hooks: [{ type: 'command', command: cmd }]
     });
-    const mcpServers: Record<string, unknown> = { ...this.buildDefaultMcpServers(cwd, cfg) };
+    const mcpServers: Record<string, unknown> = { ...this.buildDefaultMcpServers(cwd, cfg, sandboxed) };
     // gap A: sandboxed agents recall shared semantic memory via the read-only
     // MemPalace hub (an http MCP server), never a local CLI/palace mount.
     if (sandboxed && palaceHub?.url && palaceHub.token) {
@@ -1126,7 +1154,8 @@ export class HiveManager {
    */
   private buildDefaultMcpServers(
     cwd: string,
-    cfg: McpDefaultsMap
+    cfg: McpDefaultsMap,
+    sandboxed = false
   ): Record<string, { command: string; args: string[]; env?: Record<string, string> }> {
     const out: Record<string, { command: string; args: string[]; env?: Record<string, string> }> = {};
     for (const e of MCP_CATALOG) {
@@ -1140,9 +1169,16 @@ export class HiveManager {
       // Replace the `<cwd>` placeholder (filesystem/git) with the agent cwd at merge
       // time so these stay strictly workspace-scoped.
       const args = e.spec.args.map((a) => (a === '<cwd>' ? cwd : a));
+      // gap D: a sandboxed agent has no registry egress, and `npx pkg` phones home
+      // and HARD-FAILS on squid's 403 (a 403 is an HTTP response, not a network
+      // error, so npx won't fall back to cache). The eval-sandbox image pre-installs
+      // these servers as immutable binaries, so rewrite the package-runner command
+      // to the direct binary — no npx/uvx is ever invoked in-container. Unknown
+      // packages keep their original spec (they'll fail loudly rather than silently).
+      const rewritten = sandboxed ? rewriteMcpForSandbox(e.spec.command, args) : null;
       out[`munder-${e.id}`] = {
-        command: e.spec.command,
-        args,
+        command: rewritten?.command ?? e.spec.command,
+        args: rewritten?.args ?? args,
         ...(e.spec.env ? { env: e.spec.env } : {})
       };
     }
