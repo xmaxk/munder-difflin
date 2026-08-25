@@ -205,6 +205,15 @@ export interface HarnessConfig {
   sandboxNetGateway?: string;
   /** Fixed port for the sandbox-facing OTLP collector bind (gap E). Default 4319. */
   sandboxTelemetryPort?: number;
+  /** Read-only MemPalace hub MCP endpoint for sandboxed agents (gap A), e.g.
+   *  'http://palace:8765/mcp'. When set (with a readable palaceHubTokenFile) and
+   *  sandboxing is on, it's registered as an http MCP server in each agent's
+   *  settings.json AND the host-side mine loop is disabled (the hub is the sole
+   *  palace writer). Unset → semantic memory stays off for sandboxed agents. */
+  palaceHubUrl?: string;
+  /** Path to the hub's bearer-token file (0600), shared with the hub container.
+   *  The agent-sandbox setup script generates it. */
+  palaceHubTokenFile?: string;
   /** May the orchestrator ("Michael") spin up agents on its own?
    *
    *  Default FALSE. Spawning an agent is a SPEND decision, so it should not

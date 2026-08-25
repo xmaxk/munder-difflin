@@ -548,6 +548,19 @@ function postWorkerDoneOnBehalf(workerId: string, reqId: string, name: string, r
   }
 }
 
+/** Resolve the read-only MemPalace hub for a sandboxed agent's settings.json (gap A):
+ *  returns {url, token} only when sandboxing is on AND both palaceHubUrl and a
+ *  readable palaceHubTokenFile are configured. Any gap → undefined (the agent simply
+ *  gets no palace MCP server, degrading to plain memory.md reads). */
+function resolvePalaceHub(): { url: string; token: string } | undefined {
+  const cfg = readConfig();
+  if (!cfg.sandboxAgents || !cfg.palaceHubUrl || !cfg.palaceHubTokenFile) return undefined;
+  try {
+    const token = readFileSync(cfg.palaceHubTokenFile, 'utf8').trim();
+    return token ? { url: cfg.palaceHubUrl, token } : undefined;
+  } catch { return undefined; }
+}
+
 /** Gated worktree teardown for an ephemeral worker: remove it ONLY when it holds no
  *  unintegrated work; otherwise leave it (and its branch) in place and ping god, the
  *  sole integrator. Async + best-effort; on any uncertainty it KEEPS the worktree
@@ -2737,7 +2750,12 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
           theme: readConfig().terminalTheme ?? 'light',
           // W3 — default-MCP consent state + the bundled skills source dir.
           mcpDefaults: readConfig().mcpDefaults,
-          skillsDir: skillsResourceDir()
+          skillsDir: skillsResourceDir(),
+          // gap A — the read-only semantic-memory hub for sandboxed agents. Resolve
+          // the bearer from its token file HERE (hive.ts stays config-decoupled);
+          // omitted (→ no palace MCP server) unless sandboxing AND both configured
+          // AND the token is readable.
+          palaceHub: resolvePalaceHub()
         }
       );
       opts.args = [...(opts.args ?? []), ...inj.args];
@@ -5103,7 +5121,15 @@ function bootstrapHiveServices(): void {
     if (r.ok && r.endpoint) { hive.setOtelEndpoint(r.endpoint); console.log('[telemetry] collector listening', r.endpoint); }
     else console.error('[telemetry] collector failed to start:', r.error);
   });
-  memory.start(); // init shared palace + mine loop (no-op without mempalace)
+  // Host-side palace mining + CLI-env injection. DISABLED when a sandbox MemPalace
+  // hub is configured (gap A): the hub is then the SOLE palace writer (a host writer
+  // + the hub's reads on the same store is exactly the corruption the hub design
+  // avoids), and sandboxed agents recall over MCP, not the local CLI/env.
+  if (!(readConfig().sandboxAgents && readConfig().palaceHubUrl)) {
+    memory.start(); // init shared palace + mine loop (no-op without mempalace)
+  } else {
+    console.log('[memory] host mine loop disabled — the sandbox MemPalace hub owns the palace');
+  }
   reflector.start(); // bound oversized memory.md files on a timer (no-op until threshold)
 
   armAlwaysOnBeats();

@@ -262,7 +262,7 @@ export function sandboxUdsRuntimeAvailable(): boolean {
  *  it lands in NO_PROXY (below) so that internal call skips squid. */
 export async function resolveSandboxHosts(): Promise<Record<string, string>> {
   const hosts: Record<string, string> = {};
-  for (const name of ['squid', 'lemonade', 'service-a', 'service-b']) {
+  for (const name of ['squid', 'lemonade', 'palace', 'service-a', 'service-b']) {
     const r = dockerOk(['inspect', '-f', `{{(index .NetworkSettings.Networks "${DEFAULT_NETWORK}").IPAddress}}`, name]);
     const ip = r.stdout.trim();
     if (r.status === 0 && /^\d+\.\d+\.\d+\.\d+$/.test(ip)) hosts[name] = ip;
