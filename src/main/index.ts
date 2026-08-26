@@ -2993,6 +2993,15 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
   if (provider === 'codex' && opts.hive?.id) {
     await enableCodexRemoteForSpawn(opts, opts.hive.id);
   }
+  // Cursor Agent authenticates headlessly with CURSOR_API_KEY (Cursor's own
+  // container guidance: inject the env var, never mount a credential file). So
+  // cursor needs no home-seeding — just route the key into the (sandboxed)
+  // worker's env, mirroring how the OpenRouter key reaches opencode. Populated
+  // at boot from <userData>/agent-keys.env into process.env.
+  if (provider === 'cursor') {
+    const key = integrations.getSecret('apikey:cursor') || process.env.CURSOR_API_KEY;
+    if (key) opts.env = { ...(opts.env ?? {}), CURSOR_API_KEY: key };
+  }
   // ── gVisor sandbox wrap (Phase 1) — LAST, after every flag/env is assembled ──
   // Rewrites the spawn into `docker run --runtime runsc` on sandbox-net with
   // parity mounts and an env allowlist (see sandbox.ts). FAIL CLOSED: a spawn
