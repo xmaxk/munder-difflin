@@ -2967,10 +2967,20 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
       // does not persist across respawns). `read` covers reading those files. The
       // sandbox's mounts + egress are the real boundary here, so a blanket allow of
       // external paths is safe inside the container.
-      if (cfg.autoMode) oc.permission = {
-        edit: 'allow', bash: 'allow', webfetch: 'allow', read: 'allow',
-        external_directory: { '**': 'allow' }
-      };
+      if (cfg.autoMode) {
+        // A LIGHTWEIGHT (weak/local) worker is confined to its cwd: DENY every
+        // external path so the model physically cannot wander into its agent dir
+        // doing inbox/memory housekeeping instead of writing the deliverable (the
+        // reproduced local-30B failure). Its bridge plugin still drains/idle-signals
+        // over the host socket — that's not a model tool, so the deny doesn't touch
+        // it. A STANDARD worker needs its hive dir (inbox/outbox/memory live outside
+        // cwd), so it keeps the blanket allow.
+        const lightweight = opts.hive?.profile === 'lightweight';
+        oc.permission = {
+          edit: 'allow', bash: 'allow', webfetch: 'allow', read: 'allow',
+          external_directory: lightweight ? { '**': 'deny' } : { '**': 'allow' }
+        };
+      }
       const baseUrl = cfg.providerBaseUrls?.opencode;
       if (baseUrl) {
         // Register the model id the user actually selects (the part after 'local/')
@@ -4578,6 +4588,12 @@ interface SpawnRequest {
   slack?: { channel: string; thread_ts: string };     // reply target + where failures surface
   isolate?: boolean;                                   // default true (fresh worktree)
   tokenCap?: number;                                   // optional per-worker token cap (advisory P1)
+  // Worker capability profile. 'lightweight' = a minimal, cwd-confined worker for a
+  // WEAK/LOCAL model — stripped protocol seed + external paths denied so a small
+  // model spends its turn on the deliverable, not hive housekeeping. god sets it when
+  // dispatching a weak/local engine (see the spawn-queue guidance in injectedPrompt).
+  // Omitted/'standard' = a full hive citizen. Bad value degrades to 'standard'.
+  profile?: 'standard' | 'lightweight';
   // Appearance on the office floor. Both optional and both validated renderer-side
   // against the real cast and accent lists, so a bad value degrades to the default
   // rather than breaking the card.
@@ -4679,6 +4695,9 @@ async function processSpawnRequest(filePath: string): Promise<void> {
 
   const objective = typeof raw.objective === 'string' ? raw.objective.trim() : '';
   if (!objective) { fail('missing "objective"'); return; }
+  // Worker profile — explicit and god-chosen (never inferred from the model string:
+  // provider location is not a capability signal). A bad value degrades to standard.
+  const profile: 'standard' | 'lightweight' = raw.profile === 'lightweight' ? 'lightweight' : 'standard';
 
   const reqId = (typeof raw.id === 'string' && raw.id.trim() ? raw.id.trim() : basename(filePath).replace(/\.json$/i, ''))
     .replace(/[^A-Za-z0-9._-]/g, '-');
@@ -4722,7 +4741,8 @@ async function processSpawnRequest(filePath: string): Promise<void> {
     name: typeof raw.name === 'string' && raw.name.trim() ? raw.name.trim() : `Worker ${reqId.slice(0, 12)}`,
     provider: raw.provider,
     role: 'worker',
-    cwd
+    cwd,
+    ...(profile === 'lightweight' ? { profile } : {})
   };
   // Phase 2: grant this worker a broker capability over the currently-enabled
   // integrations and inject the broker URL + a per-worker capability TOKEN (a handle,
@@ -4801,11 +4821,23 @@ async function processSpawnRequest(filePath: string): Promise<void> {
     // their inbox/outbox live) and drop deliverables there instead of the project —
     // an opencode/local-30B failure traced live: correct file, wrong directory.
     const workDir = res.worktreePath ?? cwd;
-    const prefix = slack
-      ? buildAutonomousRequestProtocol(slack.channel, slack.thread_ts, slackReplyScriptPath())
-      : '[AUTONOMOUS WORKER TASK — no interactive human is watching. Work autonomously; do not ask interactive questions.] The task starts now: ';
-    const suffix = `\n\n[WORKING DIRECTORY] Your working directory is ${workDir}. Create, edit, and save ALL deliverables there — write files to ${workDir}/<filename> using that absolute path (a bare relative name may resolve elsewhere). Do NOT write deliverables into your agent/hive directory ($AGENT_DIR); that folder holds only your inbox, outbox, and memory. Whenever the task says "current working directory" or "cwd", it means ${workDir}.\n\n[CAPABILITIES] Before you start, consult your capability catalog — run the \`/capabilities\` skill (or read \`$AGENT_DIR/.claude/skills/capabilities/SKILL.md\`). It lists your temporal date-range skills (\`/today\`, \`/last30Days\`, \`/lastQuarter\`, …) and the integrations available to you (reached via the loopback broker) and how to call each. For any time-scoped work, resolve the dates with those skills instead of computing them by hand.\n\n[WORKER COMPLETION] When finished, signal done by sending ONE outbox message to god with "act":"done" and a short result summary — that releases this ephemeral worker (terminal closed; your branch is handed to god). Do NOT push to any remote; god is the sole integrator.`;
-    hive.send({ to: workerId, conversation: `worker-${reqId}`, act: 'request', subject: meta.name, body: `${prefix}${objective}${suffix}` }, 'god');
+    if (profile === 'lightweight') {
+      // Weak/local worker: ONE terse message — the objective plus WHERE to write it.
+      // No $AGENT_DIR / capabilities-catalog / outbox-protocol prose: a small model
+      // burns its turn parsing that instead of writing the file. It doesn't self-report
+      // (no Slack reply command, no `act:"done"` instruction) — the idle-done plugin +
+      // wall-clock reaper release it and god verifies the files in workDir directly,
+      // then closes any Slack loop on its behalf. Its agent dir is denied at the tool
+      // layer, so "write to workDir" is the only path it can take anyway.
+      const body = `[AUTONOMOUS TASK — no human is watching. Do the task, then stop.] Write ALL deliverable files into ${workDir} using that absolute path. Run any tests and fix failures until they pass. Do not read or write anything outside ${workDir}.\n\nTASK: ${objective}`;
+      hive.send({ to: workerId, conversation: `worker-${reqId}`, act: 'request', subject: meta.name, body }, 'god');
+    } else {
+      const prefix = slack
+        ? buildAutonomousRequestProtocol(slack.channel, slack.thread_ts, slackReplyScriptPath())
+        : '[AUTONOMOUS WORKER TASK — no interactive human is watching. Work autonomously; do not ask interactive questions.] The task starts now: ';
+      const suffix = `\n\n[WORKING DIRECTORY] Your working directory is ${workDir}. Create, edit, and save ALL deliverables there — write files to ${workDir}/<filename> using that absolute path (a bare relative name may resolve elsewhere). Do NOT write deliverables into your agent/hive directory ($AGENT_DIR); that folder holds only your inbox, outbox, and memory. Whenever the task says "current working directory" or "cwd", it means ${workDir}.\n\n[CAPABILITIES] Before you start, consult your capability catalog — run the \`/capabilities\` skill (or read \`$AGENT_DIR/.claude/skills/capabilities/SKILL.md\`). It lists your temporal date-range skills (\`/today\`, \`/last30Days\`, \`/lastQuarter\`, …) and the integrations available to you (reached via the loopback broker) and how to call each. For any time-scoped work, resolve the dates with those skills instead of computing them by hand.\n\n[WORKER COMPLETION] When finished, signal done by sending ONE outbox message to god with "act":"done" and a short result summary — that releases this ephemeral worker (terminal closed; your branch is handed to god). Do NOT push to any remote; god is the sole integrator.`;
+      hive.send({ to: workerId, conversation: `worker-${reqId}`, act: 'request', subject: meta.name, body: `${prefix}${objective}${suffix}` }, 'god');
+    }
   } catch (e) {
     console.error('[worker] dispatch send failed:', e);
   }
