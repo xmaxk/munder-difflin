@@ -2968,13 +2968,20 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
       // sandbox's mounts + egress are the real boundary here, so a blanket allow of
       // external paths is safe inside the container.
       if (cfg.autoMode) {
-        // A LIGHTWEIGHT (weak/local) worker is confined to its cwd: DENY every
-        // external path so the model physically cannot wander into its agent dir
-        // doing inbox/memory housekeeping instead of writing the deliverable (the
-        // reproduced local-30B failure). Its bridge plugin still drains/idle-signals
-        // over the host socket — that's not a model tool, so the deny doesn't touch
-        // it. A STANDARD worker needs its hive dir (inbox/outbox/memory live outside
-        // cwd), so it keeps the blanket allow.
+        // A LIGHTWEIGHT (weak/local) worker is STEERED to its cwd: DENY external
+        // paths for opencode's file tools (read/edit) so the model isn't pulled into
+        // its agent dir doing inbox/memory housekeeping instead of writing the
+        // deliverable (the reproduced local-30B failure). This is a FOCUS mechanism,
+        // not a security boundary and not absolute confinement: `bash:'allow'` is NOT
+        // gated by external_directory, so a determined model could still shell out to
+        // an external path — the gVisor container + bind mounts are the real boundary.
+        // A weak model isn't adversarial, just distractible, so steering the file
+        // tools is enough here. (Follow-up if a lightweight task needs a specific
+        // external input: a SpawnRequest.allowedReadPaths allowlist instead of blanket
+        // deny — deliberately omitted now; the bounded single-deliverable contract is
+        // cwd-self-contained.) Its bridge plugin still drains/idle-signals over the
+        // host socket (not a model tool, unaffected by the deny). A STANDARD worker
+        // needs its hive dir (inbox/outbox/memory live outside cwd) → blanket allow.
         const lightweight = opts.hive?.profile === 'lightweight';
         oc.permission = {
           edit: 'allow', bash: 'allow', webfetch: 'allow', read: 'allow',
@@ -4696,7 +4703,12 @@ async function processSpawnRequest(filePath: string): Promise<void> {
   const objective = typeof raw.objective === 'string' ? raw.objective.trim() : '';
   if (!objective) { fail('missing "objective"'); return; }
   // Worker profile — explicit and god-chosen (never inferred from the model string:
-  // provider location is not a capability signal). A bad value degrades to standard.
+  // provider location is not a capability signal). REJECT an unknown value rather than
+  // silently degrading to standard: a typo ("lightweigt") would otherwise hand a weak
+  // model the full hive surface and reinstate the exact failure the profile prevents.
+  if (raw.profile !== undefined && raw.profile !== 'standard' && raw.profile !== 'lightweight') {
+    fail(`invalid "profile" ${JSON.stringify(raw.profile)} — want "standard" or "lightweight"`); return;
+  }
   const profile: 'standard' | 'lightweight' = raw.profile === 'lightweight' ? 'lightweight' : 'standard';
 
   const reqId = (typeof raw.id === 'string' && raw.id.trim() ? raw.id.trim() : basename(filePath).replace(/\.json$/i, ''))
