@@ -283,6 +283,13 @@ export interface HarnessConfig {
    *  — idle-based, never wall-clock, so an actively-working worker is never reaped.
    *  Default 20. */
   workerIdleTimeoutMinutes?: number;
+  /** Hard WALL-CLOCK ceiling (minutes) on an ephemeral worker's total lifetime,
+   *  regardless of activity — the backstop the idle timer can't provide against an
+   *  active-but-stuck worker (e.g. an unloadable model retrying in an infinite loop
+   *  that keeps emitting output). On expiry the worker is reaped with a synthetic
+   *  done flagged as a stuck FAILURE so god escalates. Generous default so it never
+   *  cuts legitimate long work; 0 disables it. Default 20. */
+  workerMaxMinutes?: number;
   /** Registered integrations (Phase 2) — labeled REST endpoints workers reach through
    *  the loopback secret broker. METADATA ONLY: each record carries a `secretRef`
    *  handle, never the secret value (secrets live encrypted in a separate file via

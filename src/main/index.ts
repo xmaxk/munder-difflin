@@ -4922,6 +4922,29 @@ async function ephemeralWorkerTick(): Promise<void> {
           continue;
         }
       }
+      // Wall-clock cap. The idle reaper only fires on SILENCE — but an ACTIVE-but-
+      // stuck worker (seen live: opencode retrying an unloadable model —
+      // gpt-oss-120b — in an infinite loop) keeps emitting error output, so it
+      // never goes idle, never signals done, and god DEADLOCKS forever waiting for
+      // its completion. A hard ceiling on total lifetime regardless of activity is
+      // the only backstop. Generous default so it never cuts legitimate long work;
+      // 0 disables it. The synthetic done is flagged as a stuck FAILURE so god
+      // (per its worker-failure policy) escalates rather than re-running it.
+      const maxWorkerMs = Math.max(0, cfg.workerMaxMinutes ?? 20) * 60_000;
+      if (maxWorkerMs > 0 && Date.now() - rec.spawnedAt > maxWorkerMs) {
+        rec.releasing = true;
+        const mins = Math.round((Date.now() - rec.spawnedAt) / 60_000);
+        console.warn(`[worker] reaping ${workerId} — wall-clock cap (${mins}min alive, likely stuck)`);
+        informGod(
+          `[worker reaped — wall-clock] ${workerId}`,
+          `Worker ${workerId} ran ${mins} min (> the ${Math.round(maxWorkerMs / 60_000)} min wall-clock cap) without signaling done — likely STUCK (e.g. an unloadable local model retrying in a loop), so it was reaped. Treat it as a FAILURE and DO NOT re-run it identically; per your worker-failure policy, swap to a PROVEN engine or escalate.`,
+          rec.slack
+        );
+        postWorkerDoneOnBehalf(workerId, rec.reqId, rec.name ?? workerId, `${mins}min wall-clock cap (stuck)`);
+        ptyManager.kill(workerId);
+        teardownPty(workerId);
+        continue;
+      }
       const idleMs = ptyManager.idleFor(workerId);
       if (idleMs === undefined) continue; // PTY already gone; teardownPty cleans up
       if (idleMs > idleTimeoutMs) {
