@@ -57,6 +57,9 @@ export interface HarnessConfig {
    *  src/main/config.ts. */
   audience?: 'technical' | 'non-technical';
   harnessHome: string | null;
+  /** Auto-open the configured hive on boot, skipping the launch picker (default
+   *  true). Mirrors src/main/config.ts. */
+  autoOpenHive?: boolean;
   /** Recently-opened hive home folders (most-recent first) for the launch picker.
    *  Mirrors src/main/config.ts. */
   recentHives?: string[];

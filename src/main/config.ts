@@ -182,6 +182,9 @@ export interface HarnessConfig {
   audience?: 'technical' | 'non-technical';
   /** Folder where the harness keeps its own state (agent metadata, logs). */
   harnessHome: string | null;
+  /** Auto-open the configured harnessHome on boot, skipping the launch-time hive
+   *  picker (default true). Set false to always show the picker on reopen. */
+  autoOpenHive?: boolean;
   /** Recently-opened hive home folders (most-recent first), surfaced by the
    *  launch-time hive picker. Maintained by writeConfig whenever harnessHome is
    *  set (onboarding finish, changeHome). Capped to a handful. */
@@ -451,6 +454,7 @@ export interface HarnessConfig {
 const DEFAULTS: HarnessConfig = {
   onboardingComplete: false,
   harnessHome: null,
+  autoOpenHive: true,
   recentHives: [],
   registeredRepos: [],
   autoMode: true,

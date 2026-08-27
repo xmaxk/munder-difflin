@@ -110,6 +110,14 @@ export function App() {
       const withTriggers = c as HarnessConfig;
       useStore.getState().setWebhookTriggers(withTriggers.webhookTriggers ?? []);
       useStore.getState().setOrgTrigger(withTriggers.orgTrigger ?? DEFAULT_ORG_TRIGGER);
+      // Auto-open the already-configured hive on boot (skip the launch picker),
+      // unless the operator opted out (autoOpenHive:false). Removes the "click Open
+      // on <hive>" friction on every restart of a single-hive setup — a hive SWITCH
+      // still routes through the picker via the skipHivePickerOnce flag, and the
+      // Settings "change home" path is unaffected.
+      if (withTriggers.autoOpenHive !== false && withTriggers.harnessHome) {
+        setHiveOpened(true);
+      }
     });
     // Mirror BYOK OpenAI key presence (boolean only; the key never leaves main) so the
     // Realtime Michael voice toggle can gate on it. Lives in the secret broker, not
