@@ -2983,8 +2983,16 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
         // host socket (not a model tool, unaffected by the deny). A STANDARD worker
         // needs its hive dir (inbox/outbox/memory live outside cwd) → blanket allow.
         const lightweight = opts.hive?.profile === 'lightweight';
+        // task:'deny' — no subagent spawning from workers. The hive is the
+        // orchestration layer (workers spawn via spawn-requests only), and some
+        // local models (Qwen3-Coder-30B observed 2026-09-01) reach for opencode's
+        // `task` tool on the very first inbox nudge: the delegation drops the
+        // absolute $AGENT_DIR paths, the subagent works in cwd, finds nothing, and
+        // the parent idle-releases with an empty workspace — the T-013/T-016
+        // "no deliverable" signature. Denying the tool makes the model do the work
+        // inline with read/bash/write, as the cloud engines already do.
         oc.permission = {
-          edit: 'allow', bash: 'allow', webfetch: 'allow', read: 'allow',
+          edit: 'allow', bash: 'allow', webfetch: 'allow', read: 'allow', task: 'deny',
           external_directory: lightweight ? { '**': 'deny' } : { '**': 'allow' }
         };
       }
