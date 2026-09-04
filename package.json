@@ -1,6 +1,6 @@
 {
   "name": "munder-difflin",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "private": true,
   "packageManager": "pnpm@10.12.1",
   "pnpm": {
@@ -56,6 +56,7 @@
     "better-sqlite3": "^11.10.0",
     "commit-graph": "^2.4.0",
     "electron-updater": "^6.8.9",
+    "i18next": "^26.3.6",
     "localtunnel": "^2.0.2",
     "monaco-editor": "^0.52.2",
     "node-pty": "^1.0.0",
@@ -63,6 +64,7 @@
     "posthog-node": "^5.48.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-i18next": "^17.0.11",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "tunnelmole": "^2.4.0",
@@ -72,6 +74,7 @@
     "@electron/notarize": "^2.5.0",
     "@electron/rebuild": "^3.7.0",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/hast": "3.0.5",
     "@types/localtunnel": "^2.0.4",
     "@types/node": "^22.7.5",
     "@types/react": "^18.3.11",
