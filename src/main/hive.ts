@@ -847,7 +847,9 @@ export class HiveManager {
               // agentProvider.ts). workspace-write only covers cwd, so the agent
               // folder (inbox/.done, memory.md, outbox) and the shared hive root
               // (research deliverables, the board for god) are added as extra
-              // writable roots. Harmless outside auto mode.
+              // writable roots. Harmless outside auto mode. (When this worker runs in
+              // OUR gVisor sandbox, spawnAgentCore rewrites `-s workspace-write` to
+              // `-s danger-full-access` — codex's bubblewrap cannot nest in gVisor.)
               for (const d of this.sandboxWritableDirs(meta, dir, root, opts.extraWritableDirs)) preArgs.push('--add-dir', d);
             }
             else if (desc.shim === 'pi') {
@@ -1200,7 +1202,11 @@ export class HiveManager {
       // runs as before rather than refusing to spawn.
       ...(writableDirs.length
         ? {
-            sandbox: { enabled: true, filesystem: { allowWrite: writableDirs } },
+            // The native OS sandbox (bubblewrap on Linux) is for HOST agents. Inside
+            // OUR gVisor container it cannot create its namespaces and crashes the
+            // same way codex's does; gVisor is the sandbox there, so emit only the
+            // permission allowlist, never the nested OS sandbox.
+            ...(sandboxed ? {} : { sandbox: { enabled: true, filesystem: { allowWrite: writableDirs } } }),
             permissions: { additionalDirectories: writableDirs }
           }
         : {}),

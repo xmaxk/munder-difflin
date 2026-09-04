@@ -24,6 +24,9 @@ export function buildWorkerLaunch(opts: {
   defaultCommand?: string;
   /** The app's auto (skip-permissions) setting. */
   autoMode: boolean;
+  /** True when this worker will run inside our gVisor sandbox. codex's own OS
+   *  sandbox (bubblewrap) cannot nest there, so its auto flag must drop it. */
+  sandboxed?: boolean;
 }): WorkerLaunch {
   let command =
     typeof opts.requestCommand === 'string' && opts.requestCommand.trim()
@@ -39,7 +42,15 @@ export function buildWorkerLaunch(opts: {
   // request still wins: the flag's leading token already present as a TOKEN
   // (not substring — copilot's flag starts with `-s`) means the request chose.
   const provider = inferAgentProvider(command, opts.requestProvider);
-  const autoFlag = opts.autoMode ? autoModeFlagForProvider(provider) : '';
+  let autoFlag = opts.autoMode ? autoModeFlagForProvider(provider) : '';
+  // A worker that will run in our gVisor sandbox must NOT also start codex's own OS
+  // sandbox (bubblewrap on Linux): it can't create its net namespace inside gVisor
+  // and crashes every command with "bwrap: loopback: Failed RTM_NEWADDR: No child
+  // process". Swap codex's `-s workspace-write` for `-s danger-full-access` — keeps
+  // `-a never` (non-interactive), runs no bwrap; gVisor stays the enforcing sandbox.
+  if (opts.sandboxed && provider === 'codex') {
+    autoFlag = autoFlag.replace('workspace-write', 'danger-full-access');
+  }
   if (autoFlag && !hasAutoModeStance(tokenizeCommand(command), provider)) {
     command += ` ${autoFlag}`;
   }

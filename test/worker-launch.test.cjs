@@ -104,3 +104,14 @@ test('main and renderer split with the SAME tokenizer (shared module)', () => {
   // renderer's. One example locks the routing through the shared function.
   assert.deepEqual(tokenizeCommand(`a "b c" 'd e' f`), ['a', 'b c', 'd e', 'f']);
 });
+
+test('buildWorkerLaunch: a SANDBOXED codex worker drops its OS sandbox (danger-full-access)', () => {
+  const sandboxed = buildWorkerLaunch({ requestCommand: 'codex', autoMode: true, sandboxed: true });
+  assert.ok(sandboxed.args.includes('danger-full-access'), 'sandboxed codex must use -s danger-full-access');
+  assert.ok(!sandboxed.args.includes('workspace-write'), 'sandboxed codex must NOT keep -s workspace-write (bwrap nests + crashes in gVisor)');
+  assert.ok(sandboxed.args.includes('never'), 'still non-interactive (-a never)');
+  // Host codex keeps the OS sandbox (upstream 0.4.6 default).
+  const host = buildWorkerLaunch({ requestCommand: 'codex', autoMode: true, sandboxed: false });
+  assert.ok(host.args.includes('workspace-write'), 'host codex keeps -s workspace-write');
+  assert.ok(!host.args.includes('danger-full-access'), 'host codex is not full-access');
+});

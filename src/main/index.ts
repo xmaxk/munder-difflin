@@ -4826,7 +4826,8 @@ async function processSpawnRequest(filePath: string): Promise<void> {
     requestProvider: raw.provider,
     requestModel: raw.model,
     defaultCommand: cfgSpawn.defaultCommand,
-    autoMode: !!cfgSpawn.autoMode
+    autoMode: !!cfgSpawn.autoMode,
+    sandboxed: cfgSpawn.sandboxAgents === true
   });
   const bin = launch.bin;
   // Validate the executable name on the spawn path. A spawn-request file is
