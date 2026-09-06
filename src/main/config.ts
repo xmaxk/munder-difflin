@@ -901,6 +901,22 @@ export function seedSandboxAgentHome(homeDir: string, cwd: string, provider?: st
   };
   if (provider === 'codex') { copyHostDir('.codex'); return; }
   if (provider === 'antigravity' || provider === 'gemini') { copyHostDir('.gemini'); return; }
+  if (provider === 'grok') {
+    // Grok authenticates from ~/.grok/auth.json (OIDC subscription token or API key).
+    // Seed ONLY the credential — NOT the 159 MB ~/.grok/bin (the binary is baked into
+    // the sandbox image) nor host sessions/memory; the binary self-provisions the rest
+    // of GROK_HOME offline on first run. Copy only if the dest is absent, so a token the
+    // worker refreshed in place is never clobbered.
+    try {
+      const src = join(homedir(), '.grok', 'auth.json');
+      const dst = join(homeDir, '.grok', 'auth.json');
+      if (existsSync(src) && !existsSync(dst)) {
+        mkdirSync(join(homeDir, '.grok'), { recursive: true });
+        writeFileSync(dst, readFileSync(src), { mode: 0o600 });
+      }
+    } catch { /* best-effort */ }
+    return;
+  }
   if (provider && provider !== 'claude') return; // API-key engines: nothing to seed
   try {
     const claudeDir = join(homeDir, '.claude');
