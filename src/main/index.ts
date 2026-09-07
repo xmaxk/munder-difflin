@@ -4863,7 +4863,7 @@ async function processSpawnRequest(filePath: string): Promise<void> {
     provider: raw.provider,
     role: 'worker',
     cwd,
-    ...(profile === 'lightweight' ? { profile } : {})
+    ...(profile === 'lightweight' ? { profile, objective } : {})
   };
   // Phase 2: grant this worker a broker capability over the currently-enabled
   // integrations and inject the broker URL + a per-worker capability TOKEN (a handle,

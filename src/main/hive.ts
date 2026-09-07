@@ -154,6 +154,11 @@ export interface AgentMeta {
    *  it just isn't handed the full-citizen protocol. Set per-spawn-request by god;
    *  undefined/'standard' = a full hive citizen. */
   profile?: 'standard' | 'lightweight';
+  /** A worker's task, delivered IN its initial prompt (not only via the inbox).
+   *  The inbox-wake nudge is idle-gated, so a model that explores on the bare seed
+   *  instead of waiting never idles and never reads its queued objective; carrying
+   *  the task in the seed removes that dependency. Set from the spawn-request. */
+  objective?: string;
 }
 
 export interface RegistryAgent extends AgentMeta {
@@ -1470,10 +1475,20 @@ export class HiveManager {
     // is signaled by the idle-done plugin + wall-clock reaper with god verifying files
     // directly — so it needs none of that protocol. God/assistant never run lightweight.
     if (meta.profile === 'lightweight' && !meta.isGod && !meta.isAssistant) {
+      const task = (meta.objective ?? '').trim();
+      // Deliver the objective IN the seed when we have it: the inbox-wake nudge that
+      // otherwise carries it is idle-gated (12s idle + 35s boot-grace), so a model
+      // that EXPLORES on the bare seed instead of waiting never idles → never gets
+      // nudged → its queued objective is never read (reproduced live: Nanbeige4.2-3B
+      // ran ls/find, tripped the loop breaker, and asked "what is the task?"). The
+      // inbox copy still rides along as a backstop for anything that reads it first.
       return [
         `You are "${meta.name}", an autonomous coding worker.`,
-        'You will be given ONE task. Do exactly that task in your current working directory: create and edit the deliverable files there, run any tests, and fix failures until they pass.',
-        'Do NOT explore, read, or write outside your current working directory — everything you need is there. When the task is fully done, stop.'
+        task
+          ? `Your task: ${task}`
+          : 'You will be given ONE task.',
+        'Do exactly that task in your current working directory: create and edit the deliverable files there, run any tests, and fix failures until they pass.',
+        `Do NOT explore, read, or write outside your current working directory — everything you need is there.${task ? ' Start now;' : ' When the task is fully done,'} stop when it is done.`
       ].join('\n');
     }
     // Native-separator path helpers — see the 🪟 note above.
@@ -3048,7 +3063,7 @@ module.exports.default = module.exports;
 // renderer idle inbox-wake nudge delivers mail. ESM (OpenCode runs on Bun). Fully
 // wrapped. LIVE-UNVERIFIED (plugin auto-load + session.idle firing need BYOK keys).
 const OPENCODE_PLUGIN = `import { createConnection } from 'node:net';
-import { writeFileSync, mkdirSync, readdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 const SOCK = process.env.HIVE_SOCK;
 const AGENT = process.env.AGENT_ID || null;
@@ -3073,7 +3088,19 @@ function post(payload) {
 // to fire at most once and only after >=1 tool ran (never at a pre-work boot idle).
 function sendWorkerDone() {
   try {
-    if (!IS_WORKER || !AGENT_DIR || doneSent || !didWork) return;
+    if (!IS_WORKER || !AGENT_DIR || doneSent) return;
+    // SESSION HEALTH — read opencode's OWN state so the done message carries a
+    // real verdict (god supervises on this instead of guessing "UNVERIFIED").
+    // Reliable: reads files we know exist, not the in-sandbox-unavailable usage API.
+    let actualModel = '', errCount = 0;
+    try {
+      const home = process.env.HOME || '';
+      try { const mj = JSON.parse(readFileSync(join(home, '.local/state/opencode/model.json'), 'utf8')); const vk = mj && mj.variant && Object.keys(mj.variant); if (vk && vk.length) actualModel = vk[0]; } catch (e) {}
+      try { const lg = readFileSync(join(home, '.local/share/opencode/log/opencode.log'), 'utf8'); const mm = lg.match(/No endpoints found that support tool use|stream error|APICallError/g); errCount = mm ? mm.length : 0; } catch (e) {}
+    } catch (e) {}
+    // A genuine pre-work boot idle (no tool ran AND no errors) is not a release.
+    // But a FAILED session (errors, even with no successful tool) MUST report.
+    if (!didWork && errCount === 0) return;
     doneSent = true;
     const outdir = join(AGENT_DIR, 'outbox');
     // Cross-instance dedupe: the plugin file is installed under BOTH plugin/ and
@@ -3092,8 +3119,10 @@ function sendWorkerDone() {
     const id = now.replace(/[:.]/g, '-') + '-idle-done';
     const msg = {
       id: id, from: AGENT, to: 'god', act: 'done', conversation: 'worker-' + AGENT,
-      subject: 'Session idle — releasing (deliverables UNVERIFIED)',
-      body: 'AUTO-SIGNALED by the opencode hive plugin: this session went idle after running at least one tool, and the model did not post its own done. This message only means the worker STOPPED — it does NOT confirm the objective was met or that any deliverable was written. VERIFY the expected output in the working directory before counting this task complete.',
+      subject: 'Session idle — SESSION-HEALTH: ' + (errCount > 0 ? 'LIKELY FAILED (see body)' : 'stopped, verify deliverable'),
+      body: (errCount > 0
+        ? ('AUTO-SIGNALED by the opencode hive plugin (session-health). LIKELY FAILED: ' + errCount + ' tool-use/stream errors this session; it ran model ' + (actualModel || '?') + '. If that is NOT the model you requested, opencode silently fell back to a default (a hive LOCAL worker needs local/<model>, never lemonade/<model>). Re-dispatch with the correct provider/model — do NOT count this done.')
+        : ('AUTO-SIGNALED by the opencode hive plugin (session-health). Ran model ' + (actualModel || '?') + ' with no session errors. This only confirms it STOPPED — VERIFY the deliverable in the cwd before counting it done.')),
       created_at: now, hops: 0, requires_reply: false, needs_human: false
     };
     const outbox = join(AGENT_DIR, 'outbox');
