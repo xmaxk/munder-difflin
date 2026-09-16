@@ -425,6 +425,31 @@
     },
     "youtube": []
   },
+  "claude-code-max-plan-tips": {
+    "title": "How to Get the Most Out of Your Claude Code Max Plan",
+    "category": "guides",
+    "hero": {
+      "file": "assets/media/claude-code-max-plan-tips/hero.png",
+      "alt": "A yellow cartoon character at a desk with an hourglass, stacked terminal windows, a wall calendar with ticks and a nearly full gauge",
+      "prompt": "Generated with Antigravity (gemini-3.1-flash-image) by jim-mu106131, 14 Sep 2026, house style: ink line art, yellow bean, no red, no text.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/claude-code-max-plan-tips/note-1.png",
+        "alt": "An hourglass beside a seven day strip with some days filled in",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/claude-code-max-plan-tips/note-2.png",
+        "alt": "A yellow cartoon character conducting three terminal windows, each with a small bean typing inside",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
   "claude-code-multi-agent-setup-tutorial": {
     "title": "Set Up a Claude Code Multi-Agent Workflow in 10 Minutes",
     "category": "guides",
@@ -525,6 +550,56 @@
     },
     "youtube": []
   },
+  "claude-code-vs-antigravity": {
+    "title": "Claude Code vs Antigravity: Which One Fits Your Work?",
+    "category": "comparisons",
+    "hero": {
+      "file": "assets/media/claude-code-vs-antigravity/hero.png",
+      "alt": "Illustration: Claude Code vs Antigravity: Which One Fits Your Work?",
+      "prompt": "Hero image for a blog post titled \"Claude Code vs Antigravity: Which One Fits Your Work?\". The post is about: Claude Code vs Google Antigravity, checked 14 Sep 2026: terminal agent or desktop agent app, Claude inside Antigravity, plans, limits and a verdict.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/claude-code-vs-antigravity/note-1.png",
+        "alt": "Hand-drawn sketch from “Claude Code vs Antigravity: Which One Fits Your Work?”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/claude-code-vs-antigravity/note-2.png",
+        "alt": "Hand-drawn sketch from “Claude Code vs Antigravity: Which One Fits Your Work?”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "claude-code-vs-cursor": {
+    "title": "Claude Code vs Cursor: Which Is Better in 2026?",
+    "category": "comparisons",
+    "hero": {
+      "file": "assets/media/claude-code-vs-cursor/hero.png",
+      "alt": "Hand drawn sketch: a yellow character with a magnifying glass between two windows labelled claude code and cursor",
+      "prompt": "Hero image for a blog post titled \"Claude Code vs Cursor: Which Is Better in 2026?\". The post is about: Claude Code vs Cursor, checked 14 Sep 2026: where each runs, models, plans, the new Claude Code weekly limits, parallel agents and using both.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/claude-code-vs-cursor/note-1.png",
+        "alt": "Hand drawn sketch: two windows side by side with a character inspecting one",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/claude-code-vs-cursor/note-2.png",
+        "alt": "Hand drawn sketch: a character presenting a board on an easel",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
   "claude-squad-alternative": {
     "title": "Looking for a Claude Squad Alternative?",
     "category": "comparisons",
@@ -594,6 +669,56 @@
       "note-2": {
         "file": "assets/media/cline-vs-munder-difflin/note-2.png",
         "alt": "Hand-drawn sketch from “Cline vs Munder Difflin: In-Editor Agent or Local Hive?”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "codex-cli-vs-claude-code": {
+    "title": "Codex CLI vs Claude Code",
+    "category": "comparisons",
+    "hero": {
+      "file": "assets/media/codex-cli-vs-claude-code/hero.png",
+      "alt": "Illustration: Codex CLI vs Claude Code",
+      "prompt": "Hero image for a blog post titled \"Codex CLI vs Claude Code\". The post is about: Codex CLI and Claude Code compared firsthand: sandbox and approval flags, AGENTS.md vs CLAUDE.md, real pricing, and where each terminal agent wins.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/codex-cli-vs-claude-code/note-1.png",
+        "alt": "Hand-drawn sketch from “Codex CLI vs Claude Code”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/codex-cli-vs-claude-code/note-2.png",
+        "alt": "Hand-drawn sketch from “Codex CLI vs Claude Code”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "codex-max-plan-tips": {
+    "title": "How to Make the Most of Your Codex Max Plan",
+    "category": "guides",
+    "hero": {
+      "file": "assets/media/codex-max-plan-tips/hero.png",
+      "alt": "A yellow cartoon character turning a big dial all the way up at a workbench while paper planes fly from a laptop to a cloud",
+      "prompt": "Generated with Antigravity (gemini-3.1-flash-image) by jim-mu106131, 14 Sep 2026, house style: ink line art, yellow bean, no red, no text.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/codex-max-plan-tips/note-1.png",
+        "alt": "Parcels travelling between a laptop and a cloud along a dotted path, past a small meter",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/codex-max-plan-tips/note-2.png",
+        "alt": "A yellow cartoon character reaching for a small screwdriver on a pegboard that also holds a wrench and a sledgehammer",
         "prompt": "",
         "status": "ready"
       }
@@ -1050,6 +1175,56 @@
     },
     "youtube": []
   },
+  "grok-bot-alternatives": {
+    "title": "Grok Bot Alternatives: Six Picks, Grouped by What You Want",
+    "category": "comparisons",
+    "hero": {
+      "file": "assets/media/grok-bot-alternatives/hero.png",
+      "alt": "A yellow cartoon character with a clipboard at a signpost, choosing between a cloud kiosk, a phone, a laptop desk and a small home server",
+      "prompt": "Generated with Antigravity (gemini-3.1-flash-image) by jim-mu106131, 14 Sep 2026, house style: ink line art, yellow bean, no red, no text.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/grok-bot-alternatives/note-1.png",
+        "alt": "Papers locked in a drawer inside a faraway cloud, next to the same papers on a desk beside a laptop",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/grok-bot-alternatives/note-2.png",
+        "alt": "A yellow cartoon character hands a ring of keys to a small robot helper while keeping one key back, with an open notebook between them",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "herdr-alternatives": {
+    "title": "Herdr Alternatives: What to Pick and Who Each One Fits",
+    "category": "comparisons",
+    "hero": {
+      "file": "assets/media/herdr-alternatives/hero.png",
+      "alt": "A yellow cartoon character as a shepherd with a crook, herding small terminal windows with legs across a hill",
+      "prompt": "Generated with Antigravity (gemini-3.1-flash-image) by jim-mu106131, 14 Sep 2026, house style: ink line art, yellow bean, no red, no text.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/herdr-alternatives/note-1.png",
+        "alt": "A monitor split into terminal panes next to a small office floor with a bean at each desk",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/herdr-alternatives/note-2.png",
+        "alt": "Four terminal windows showing an hourglass, a spinning gear, a check mark and a sleeping cloud",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
   "hire-manifest-untrusted-input": {
     "title": "Treating a Hire Manifest as Untrusted Input",
     "category": "internals",
@@ -1150,6 +1325,31 @@
     },
     "youtube": []
   },
+  "how-much-does-claude-code-cost": {
+    "title": "How Much Does Claude Code Cost?",
+    "category": "concepts",
+    "hero": {
+      "file": "assets/media/how-much-does-claude-code-cost/hero.png",
+      "alt": "Illustration: How Much Does Claude Code Cost?",
+      "prompt": "Hero image for a blog post titled \"How Much Does Claude Code Cost?\". The post is about: What Claude Code actually costs: free plan access, Claude Pro and Max pricing, per token API rates, and what running several agents does to the bill.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/how-much-does-claude-code-cost/note-1.png",
+        "alt": "Hand-drawn sketch from “How Much Does Claude Code Cost?”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/how-much-does-claude-code-cost/note-2.png",
+        "alt": "Hand-drawn sketch from “How Much Does Claude Code Cost?”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
   "how-the-god-orchestrator-works": {
     "title": "Inside the GOD Orchestrator: Routing, Adjudication, Escalation",
     "category": "orchestration",
@@ -1200,6 +1400,31 @@
     },
     "youtube": []
   },
+  "how-to-add-an-mcp-server-to-claude-code": {
+    "title": "How to Add an MCP Server to Claude Code",
+    "category": "guides",
+    "hero": {
+      "file": "assets/media/how-to-add-an-mcp-server-to-claude-code/hero.png",
+      "alt": "Illustration: How to Add an MCP Server to Claude Code",
+      "prompt": "Hero image for a blog post titled \"How to Add an MCP Server to Claude Code\". The post is about: The claude mcp add command, its scope flag, editing .mcp.json by hand, and how Munder Difflin's Capabilities screen grants an MCP server to one agent at a time.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/how-to-add-an-mcp-server-to-claude-code/note-1.png",
+        "alt": "Hand-drawn sketch from “How to Add an MCP Server to Claude Code”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/how-to-add-an-mcp-server-to-claude-code/note-2.png",
+        "alt": "Hand-drawn sketch from “How to Add an MCP Server to Claude Code”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
   "how-to-choose-a-multi-agent-tool": {
     "title": "How to Choose a Multi-Agent Coding Tool: A Buyer's Checklist",
     "category": "comparisons",
@@ -1219,6 +1444,31 @@
       "note-2": {
         "file": "assets/media/how-to-choose-a-multi-agent-tool/note-2.png",
         "alt": "Hand-drawn sketch from “How to Choose a Multi-Agent Coding Tool: A Buyer's Checklist”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "how-to-connect-ollama-to-claude-code": {
+    "title": "How to Connect Ollama to Claude Code",
+    "category": "guides",
+    "hero": {
+      "file": "assets/media/how-to-connect-ollama-to-claude-code/hero.png",
+      "alt": "Illustration: How to Connect Ollama to Claude Code",
+      "prompt": "Hero image for a blog post titled \"How to Connect Ollama to Claude Code\". The post is about: Point Claude Code at Ollama with ollama launch claude or three environment variables, give the model 64K of context, and know what stops working.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/how-to-connect-ollama-to-claude-code/note-1.png",
+        "alt": "Hand-drawn sketch from “How to Connect Ollama to Claude Code”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/how-to-connect-ollama-to-claude-code/note-2.png",
+        "alt": "Hand-drawn sketch from “How to Connect Ollama to Claude Code”",
         "prompt": "",
         "status": "ready"
       }
@@ -1359,6 +1609,31 @@
     },
     "youtube": []
   },
+  "how-to-install-codex-cli": {
+    "title": "How to Install Codex CLI on Mac, Windows and Linux",
+    "category": "guides",
+    "hero": {
+      "file": "assets/media/how-to-install-codex-cli/hero.png",
+      "alt": "Hand drawn sketch: a yellow character at a desk with a terminal window, labelled npm, brew or script, and install, sign in, update",
+      "prompt": "Hero image for a blog post titled \"How to Install Codex CLI on Mac, Windows and Linux\". The post is about: Install OpenAI's Codex CLI with the official script, npm or Homebrew, sign in with ChatGPT or an API key, then update it and check your version.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/how-to-install-codex-cli/note-1.png",
+        "alt": "Hand drawn sketch: a character at a desk typing into a terminal",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/how-to-install-codex-cli/note-2.png",
+        "alt": "Hand drawn sketch: a character carrying a letter towards a box",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
   "how-to-run-multiple-claude-code-agents": {
     "title": "How to Run Multiple Claude Code Agents (Without Losing Track)",
     "category": "guides",
@@ -1403,6 +1678,31 @@
       "note-2": {
         "file": "assets/media/how-to-talk-to-your-orchestrator/note-2.png",
         "alt": "Hand-drawn sketch from “How to Brief Your Orchestrator (So the Floor Actually Ships)”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "how-to-use-claude-code-plan-mode": {
+    "title": "How to Use Claude Code Plan Mode",
+    "category": "guides",
+    "hero": {
+      "file": "assets/media/how-to-use-claude-code-plan-mode/hero.png",
+      "alt": "Illustration: How to Use Claude Code Plan Mode",
+      "prompt": "Hero image for a blog post titled \"How to Use Claude Code Plan Mode\". The post is about: How Claude Code's plan mode works: turning it on, what it blocks, real headless --permission-mode plan output, and how to leave it.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/how-to-use-claude-code-plan-mode/note-1.png",
+        "alt": "Hand-drawn sketch from “How to Use Claude Code Plan Mode”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/how-to-use-claude-code-plan-mode/note-2.png",
+        "alt": "Hand-drawn sketch from “How to Use Claude Code Plan Mode”",
         "prompt": "",
         "status": "ready"
       }
@@ -1478,6 +1778,56 @@
       "note-2": {
         "file": "assets/media/human-in-the-loop-approving-ai-agents/note-2.png",
         "alt": "Hand-drawn sketch from “Approving AI Agents: Human-in-the-Loop Without a Queue”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "is-claude-code-max-worth-it": {
+    "title": "Is It Worth Paying for Claude Code Max?",
+    "category": "concepts",
+    "hero": {
+      "file": "assets/media/is-claude-code-max-worth-it/hero.png",
+      "alt": "Illustration: Is It Worth Paying for Claude Code Max?",
+      "prompt": "Hero image for a blog post titled \"Is It Worth Paying for Claude Code Max?\". The post is about: Who should pay for Claude Max 5x or 20x, who should stay on Pro or an API key, and the break even math to run on your own Claude Code usage.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/is-claude-code-max-worth-it/note-1.png",
+        "alt": "Hand-drawn sketch from “Is It Worth Paying for Claude Code Max?”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/is-claude-code-max-worth-it/note-2.png",
+        "alt": "Hand-drawn sketch from “Is It Worth Paying for Claude Code Max?”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "is-claude-code-open-source": {
+    "title": "Is Claude Code Open Source?",
+    "category": "concepts",
+    "hero": {
+      "file": "assets/media/is-claude-code-open-source/hero.png",
+      "alt": "Illustration: Is Claude Code Open Source?",
+      "prompt": "Hero image for a blog post titled \"Is Claude Code Open Source?\". The post is about: No. Claude Code is proprietary under Anthropic's terms. What its GitHub repo holds, what the 2026 leak changed, and which open tools sit around it.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/is-claude-code-open-source/note-1.png",
+        "alt": "Hand-drawn sketch from “Is Claude Code Open Source?”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/is-claude-code-open-source/note-2.png",
+        "alt": "Hand-drawn sketch from “Is Claude Code Open Source?”",
         "prompt": "",
         "status": "ready"
       }
@@ -1709,6 +2059,62 @@
       "note-3": {
         "file": "assets/media/launching-munder-difflin-v0-4-4/note-3.png",
         "alt": "Hand-drawn sketch from “Launching Munder Difflin v0.4.4: Windows Agents Can Finally Talk”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "launching-munder-difflin-v0-4-6": {
+    "title": "Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now",
+    "category": "story",
+    "hero": {
+      "file": "assets/media/launching-munder-difflin-v0-4-6/hero.png",
+      "alt": "Illustration: Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now",
+      "prompt": "Hero image for a blog post titled \"Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now\". The post is about: v0.4.6 adds Chinese and Arabic interfaces with right-to-left support, ships its fonts inside the app so nothing is fetched from Google, and makes the updater actually update itself instead of pointing at a download page.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/launching-munder-difflin-v0-4-6/note-1.png",
+        "alt": "Hand-drawn sketch from “Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/launching-munder-difflin-v0-4-6/note-2.png",
+        "alt": "Hand-drawn sketch from “Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-3": {
+        "file": "assets/media/launching-munder-difflin-v0-4-6/note-3.png",
+        "alt": "Hand-drawn sketch from “Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "launching-munder-difflin-v0-5-2": {
+    "title": "Munder Difflin 0.5.2: Pro, the Stapler and Everything Since 0.4.6",
+    "category": "story",
+    "hero": {
+      "file": "assets/media/launching-munder-difflin-v0-5-2/hero.png",
+      "alt": "Illustration: Munder Difflin 0.5.2: Pro, the Stapler and Everything Since 0.4.6",
+      "prompt": "Hero image for a blog post titled \"Munder Difflin 0.5.2: Pro, the Stapler and Everything Since 0.4.6\". The post is about: Munder Difflin 0.5.2 is out: how to install it, how to start Pro, what Pro adds, what changed since 0.4.6, and the end of signed Community builds.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/launching-munder-difflin-v0-5-2/note-1.png",
+        "alt": "Hand-drawn sketch from “Munder Difflin 0.5.2: Pro, the Stapler and Everything Since 0.4.6”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/launching-munder-difflin-v0-5-2/note-2.png",
+        "alt": "Hand-drawn sketch from “Munder Difflin 0.5.2: Pro, the Stapler and Everything Since 0.4.6”",
         "prompt": "",
         "status": "ready"
       }
@@ -2053,6 +2459,31 @@
       "note-2": {
         "file": "assets/media/observability-for-agent-fleets/note-2.png",
         "alt": "Hand-drawn sketch from “Observability for Agent Fleets: Seeing What Your Agents Do”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "omniagent-alternatives": {
+    "title": "OmniAgent Alternatives: What to Use Instead of Databricks Omnigent",
+    "category": "comparisons",
+    "hero": {
+      "file": "assets/media/omniagent-alternatives/hero.png",
+      "alt": "Hand drawn sketch: two agents at their desks and a yellow character handing work to a todo, doing, done board, labelled one harness, many agents",
+      "prompt": "Code drawn (media-src spec.js, fleet archetype), founder choice 14 Sep 2026.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/omniagent-alternatives/note-1.png",
+        "alt": "Hand drawn sketch: two agents working at their own desks",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/omniagent-alternatives/note-2.png",
+        "alt": "Hand drawn sketch: a todo, doing, done board with task cards",
         "prompt": "",
         "status": "ready"
       }
@@ -3090,6 +3521,31 @@
     },
     "youtube": []
   },
+  "what-is-an-mcp-server": {
+    "title": "What Is an MCP Server?",
+    "category": "concepts",
+    "hero": {
+      "file": "assets/media/what-is-an-mcp-server/hero.png",
+      "alt": "Illustration: What Is an MCP Server?",
+      "prompt": "Hero image for a blog post titled \"What Is an MCP Server?\". The post is about: An MCP server gives an AI agent tools, data and prompts over one open protocol. What it is, the host, client and server roles, and where Claude Code plugs in.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/what-is-an-mcp-server/note-1.png",
+        "alt": "Hand-drawn sketch from “What Is an MCP Server?”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/what-is-an-mcp-server/note-2.png",
+        "alt": "Hand-drawn sketch from “What Is an MCP Server?”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
   "what-is-harness-engineering": {
     "title": "What Is Harness Engineering?",
     "category": "concepts",
@@ -3109,6 +3565,31 @@
       "note-2": {
         "file": "assets/media/what-is-harness-engineering/note-2.png",
         "alt": "Hand-drawn sketch from “What Is Harness Engineering?”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "what-is-vibe-coding": {
+    "title": "What Is Vibe Coding? Meaning, Risks and Safer Habits",
+    "category": "concepts",
+    "hero": {
+      "file": "assets/media/what-is-vibe-coding/hero.png",
+      "alt": "Hand drawn sketch: two yellow characters talking, one saying just vibes, captioned then someone reads the diff",
+      "prompt": "Hero image for a blog post titled \"What Is Vibe Coding? Meaning, Risks and Safer Habits\". The post is about: Vibe coding means building software from AI prompts without reading the code. Where the term came from, when it is fine, where it bites, and what to check.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/what-is-vibe-coding/note-1.png",
+        "alt": "Hand drawn sketch: two characters exchanging speech bubbles",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/what-is-vibe-coding/note-2.png",
+        "alt": "Hand drawn sketch: letters arriving in an inbox",
         "prompt": "",
         "status": "ready"
       }
@@ -3240,6 +3721,31 @@
     },
     "youtube": []
   },
+  "why-does-claude-code-keep-asking-for-permission": {
+    "title": "Why Does Claude Code Keep Asking for Permission?",
+    "category": "guides",
+    "hero": {
+      "file": "assets/media/why-does-claude-code-keep-asking-for-permission/hero.png",
+      "alt": "Hand drawn sketch: a yellow character behind a shield that blocks lightning bolts, labelled allow this command and allow rules",
+      "prompt": "Hero image for a blog post titled \"Why Does Claude Code Keep Asking for Permission?\". The post is about: Claude Code asks because Manual mode gates edits, shell commands and web requests. The fixes, safest first: modes, allow rules, sandboxing, then bypass.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/why-does-claude-code-keep-asking-for-permission/note-1.png",
+        "alt": "Hand drawn sketch: a shield with a check mark stopping a lightning bolt",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/why-does-claude-code-keep-asking-for-permission/note-2.png",
+        "alt": "Hand drawn sketch: a character raising its arms under a ringing bell",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
   "why-local-first-matters-for-ai-agents": {
     "title": "Why Local-First Matters for Your AI Agents",
     "category": "use-cases",
@@ -3316,30 +3822,168 @@
     "youtube": []
   },
   "your-first-hour-with-munder-difflin": {
-    "title": "Your First Hour With Munder Difflin",
+    "title": "Your First Hour With Munder Difflin: Onboarding to a Pro Office",
     "category": "guides",
     "hero": {
       "file": "assets/media/your-first-hour-with-munder-difflin/hero.png",
-      "alt": "Illustration: Your First Hour With Munder Difflin",
-      "prompt": "Hero image for a blog post titled \"Your First Hour With Munder Difflin\". The post is about: A minute-by-minute walkthrough of your first hour with Munder Difflin: install, the onboarding wizard, your first brief to Michael, watching the floor, approving your first escalation, and leaving a schedule running.",
+      "alt": "Michael, the orchestrator, in the Pro app after dispatching four tasks to his agents",
+      "prompt": "",
       "status": "ready"
     },
     "inline": {
-      "floor-view": {
-        "file": "assets/media/your-first-hour-with-munder-difflin/floor-view.png",
-        "alt": "The office floor: suited agents at desks, one carrying a sticky note to the kanban wall",
-        "prompt": "Inline figure: the office floor as a system, mid-task. Several suited Xiaohei agents at simple hand-drawn desks with terminals; one Xiaohei carries a sticky note from his desk toward a kanban wall with three columns. Annotate the columns 'todo', 'doing', 'done' in blue, and the walking agent 'message in transit' in orange.",
-        "status": "ready"
-      },
-      "note-1": {
-        "file": "assets/media/your-first-hour-with-munder-difflin/note-1.png",
-        "alt": "Hand-drawn sketch from “Your First Hour With Munder Difflin”",
+      "a1-landing": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/a1-landing.png",
+        "alt": "The top of munderdiffl.in with the Download free button",
         "prompt": "",
         "status": "ready"
       },
-      "note-2": {
-        "file": "assets/media/your-first-hour-with-munder-difflin/note-2.png",
-        "alt": "Hand-drawn sketch from “Your First Hour With Munder Difflin”",
+      "a3-download": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/a3-download.png",
+        "alt": "The Munder Difflin 0.5.2 download card with macOS, Windows and Linux builds",
+        "prompt": "",
+        "status": "ready"
+      },
+      "b1-terminal": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/b1-terminal.png",
+        "alt": "A terminal installing Claude Code, Codex and OpenCode with npm, then printing each version",
+        "prompt": "",
+        "status": "ready"
+      },
+      "b2-prerequisites": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/b2-prerequisites.png",
+        "alt": "Settings, Prerequisites in Munder Difflin listing agent engines, with Claude Code, Codex and OpenCode marked Found",
+        "prompt": "",
+        "status": "ready"
+      },
+      "c1-entry": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/c1-entry.png",
+        "alt": "The first onboarding step, How are you using Munder Difflin, with On my own selected",
+        "prompt": "",
+        "status": "ready"
+      },
+      "c2-signin": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/c2-signin.png",
+        "alt": "The Sign in to continue step with a box to paste the code from the browser",
+        "prompt": "",
+        "status": "ready"
+      },
+      "c4-orchestrator": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/c4-orchestrator.png",
+        "alt": "The Meet your orchestrator step: Michael on Claude Code, marked Installed, with Opus 4.8 1M",
+        "prompt": "",
+        "status": "ready"
+      },
+      "c5-engines": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/c5-engines.png",
+        "alt": "The orchestrator engine list open, from Claude Code and Codex down to OpenCode, Pi, Copilot and Cursor",
+        "prompt": "",
+        "status": "ready"
+      },
+      "c7-paywall": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/c7-paywall.png",
+        "alt": "The Go PRO on this machine screen listing what Pro adds, with Continue with the free version, I have a licence key and Get PRO",
+        "prompt": "",
+        "status": "ready"
+      },
+      "c8-license": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/c8-license.png",
+        "alt": "The Enter your license key screen with an empty key field and an Activate button",
+        "prompt": "",
+        "status": "ready"
+      },
+      "d2-agents": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/d2-agents.png",
+        "alt": "The Pro Agents screen with Michael's budget and breaker cards above Jim, Dwight, Angela on Codex and Oscar on OpenCode",
+        "prompt": "",
+        "status": "ready"
+      },
+      "d3-add-agent": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/d3-add-agent.png",
+        "alt": "Add an agent: the Provider list, Model set to Sonnet 5, the exact command, and Token cap chips with 800k chosen",
+        "prompt": "",
+        "status": "ready"
+      },
+      "d4-agent": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/d4-agent.png",
+        "alt": "Jim's agent room: a live Claude Code terminal reviewing a change, with an 800k token cap in force on the right",
+        "prompt": "",
+        "status": "ready"
+      },
+      "e1-pr-sweep": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/e1-pr-sweep.png",
+        "alt": "A scheduled automation named PR review sweep, every 30 minutes, sent to Jim",
+        "prompt": "",
+        "status": "ready"
+      },
+      "h3-slack": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/h3-slack.png",
+        "alt": "The Slack card in Settings, Connections with the bot token field, required scopes and the three ways Slack reaches the office",
+        "prompt": "",
+        "status": "ready"
+      },
+      "e2-morning-brief": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/e2-morning-brief.png",
+        "alt": "A weekly automation named Morning brief, Monday to Friday at 08:30, asking a Claude Code agent to use the Gmail and Google Calendar connectors",
+        "prompt": "",
+        "status": "ready"
+      },
+      "e7-connectors": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/e7-connectors.png",
+        "alt": "The /mcp list in a Claude Code agent's terminal showing claude.ai Gmail and Google Calendar connected",
+        "prompt": "",
+        "status": "ready"
+      },
+      "e4-automations": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/e4-automations.png",
+        "alt": "The Automations list with PR review sweep, Morning brief, Blog writer and the default automations",
+        "prompt": "",
+        "status": "ready"
+      },
+      "e5-webhook": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/e5-webhook.png",
+        "alt": "A webhook endpoint sheet: name, endpoint, secret, strict gate, standing prompt, security warning switch and payload schema",
+        "prompt": "",
+        "status": "ready"
+      },
+      "f1-tasks": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/f1-tasks.png",
+        "alt": "The Pro Tasks board with cards in To do, Doing, Blocked and Done",
+        "prompt": "",
+        "status": "ready"
+      },
+      "f2-inbox": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/f2-inbox.png",
+        "alt": "The Pro Inbox with For you, Your team, Everyone and Outside, showing Dwight's done message",
+        "prompt": "",
+        "status": "ready"
+      },
+      "f4-memory": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/f4-memory.png",
+        "alt": "Memory search results for test, grouped as Tickets, Agents and Memories, across everyone's memory",
+        "prompt": "",
+        "status": "ready"
+      },
+      "f5-capabilities": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/f5-capabilities.png",
+        "alt": "The Capabilities marketplace, a curated catalog with Skills, MCP, Engines and Plugins filters",
+        "prompt": "",
+        "status": "ready"
+      },
+      "f8-voice": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/f8-voice.png",
+        "alt": "Settings, Voice: Free Flow dictation with a Groq API key field, and Realtime Michael with an OpenAI API key field",
+        "prompt": "",
+        "status": "ready"
+      },
+      "g1-stapler": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/g1-stapler.png",
+        "alt": "The Stapler screen with the stapler on screen and its face, shape, expression, size and colour settings",
+        "prompt": "",
+        "status": "ready"
+      },
+      "g3-ring": {
+        "file": "assets/media/your-first-hour-with-munder-difflin/g3-ring.png",
+        "alt": "The floating Stapler with its action ring open",
         "prompt": "",
         "status": "ready"
       }
@@ -3352,31 +3996,191 @@
       }
     ]
   },
-  "launching-munder-difflin-v0-4-6": {
-    "title": "Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now",
-    "category": "story",
+  "connect-slack-to-munder-difflin": {
+    "title": "How to Connect Slack to Munder Difflin 0.5.2",
+    "category": "guides",
     "hero": {
-      "file": "assets/media/launching-munder-difflin-v0-4-6/hero.png",
-      "alt": "Illustration: Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now",
-      "prompt": "Hero image for a blog post titled \"Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now\". The post is about: v0.4.6 adds Chinese and Arabic interfaces with right-to-left support, ships its fonts inside the app so nothing is fetched from Google, and makes the updater actually update itself instead of pointing at a download page.",
+      "file": "assets/media/connect-slack-to-munder-difflin/hero.png",
+      "alt": "The Slack card in Munder Difflin 0.5.2 settings, with the bot token field, required scopes and Test connection",
+      "prompt": "",
+      "status": "ready"
+    },
+    "inline": {
+      "modes": {
+        "file": "assets/media/connect-slack-to-munder-difflin/modes.png",
+        "alt": "How Slack reaches the office: Check for messages, Stay connected and Let Slack call the office, with Check every and Channel ID",
+        "prompt": "",
+        "status": "ready"
+      },
+      "steps": {
+        "file": "assets/media/connect-slack-to-munder-difflin/steps.png",
+        "alt": "The in app connect steps for Check for messages",
+        "prompt": "",
+        "status": "ready"
+      },
+      "who": {
+        "file": "assets/media/connect-slack-to-munder-difflin/who.png",
+        "alt": "The Who answers inbound messages list with Michael recommended",
+        "prompt": "",
+        "status": "ready"
+      },
+      "stay": {
+        "file": "assets/media/connect-slack-to-munder-difflin/stay.png",
+        "alt": "The Slack card set to Stay connected, with Bot token and App token fields and Catch up every",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "build-your-personal-agi-on-your-computer": {
+    "title": "Build Your Personal AGI on Your Computer Using Claude Code and Munder Difflin",
+    "category": "guides",
+    "hero": {
+      "file": "assets/media/build-your-personal-agi-on-your-computer/hero.png",
+      "alt": "The Munder Difflin 0.5.2 Agents screen: Michael the orchestrator with spend, circuit breaker, tasks and one question waiting, above Jim, Dwight, Angela and Oscar",
+      "prompt": "",
+      "status": "ready"
+    },
+    "inline": {
+      "add-agent": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/d3-add-agent.png",
+        "alt": "Add an agent: the Provider list, Model set to Sonnet 5, the exact command, and Token cap choices with 800k selected",
+        "prompt": "",
+        "status": "ready"
+      },
+      "dispatch": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/dispatch.png",
+        "alt": "Michael's terminal after dispatching the acme-notes job: four tasks for Dwight, Angela, Oscar and Jim, and the failing test he found first",
+        "prompt": "",
+        "status": "ready"
+      },
+      "summary": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/summary.png",
+        "alt": "Michael's final report: all four acme-notes tasks done, tasks 2 and 3 moved to Dwight, every review PASS, and two judgment calls he made without asking",
+        "prompt": "",
+        "status": "ready"
+      },
+      "connectors": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/e7-connectors.png",
+        "alt": "The /mcp list in a Claude Code agent's terminal showing claude.ai Gmail and Google Calendar connected",
+        "prompt": "",
+        "status": "ready"
+      },
+      "morning-brief": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/e2-morning-brief.png",
+        "alt": "A weekly automation named Morning brief, weekdays at 08:30, sent to Dwight with a message to summarise unread email and today's meetings",
+        "prompt": "",
+        "status": "ready"
+      },
+      "pr-sweep": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/e1-pr-sweep.png",
+        "alt": "An automation named PR review sweep, every 30 minutes, sent to Jim with a message to review new pull requests",
+        "prompt": "",
+        "status": "ready"
+      },
+      "tasks": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/f1-tasks.png",
+        "alt": "The Tasks board with Publish acme-notes to npm in Blocked, marked asks you",
+        "prompt": "",
+        "status": "ready"
+      },
+      "memory": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/f4-memory.png",
+        "alt": "Memory search results grouped as Tickets, Agents and Memories, with Dwight's notes about the reassigned tasks",
+        "prompt": "",
+        "status": "ready"
+      },
+      "voice": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/f8-voice.png",
+        "alt": "Settings, Voice: Free Flow dictation with a Groq API key field, and Realtime Michael with an OpenAI API key field",
+        "prompt": "",
+        "status": "ready"
+      },
+      "slack-who": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/slack-who.png",
+        "alt": "The Who answers inbound messages list with Michael recommended",
+        "prompt": "",
+        "status": "ready"
+      },
+      "slack-modes": {
+        "file": "assets/media/build-your-personal-agi-on-your-computer/slack-modes.png",
+        "alt": "How Slack reaches the office: Check for messages, Stay connected and Let Slack call the office",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "how-to-install-gemini-cli": {
+    "title": "How to Install Gemini CLI, and Who Can Still Use It in 2026",
+    "category": "guides",
+    "hero": {
+      "file": "assets/media/how-to-install-gemini-cli/hero.png",
+      "alt": "Illustration: How to Install Gemini CLI, and Who Can Still Use It in 2026",
+      "prompt": "Hero image for a blog post titled \"How to Install Gemini CLI, and Who Can Still Use It in 2026\". The post is about: Install Google's Gemini CLI with npm on Mac, Windows or Linux, why Homebrew is stuck on 0.46.0, and which sign in still works after 18 Jun 2026.",
       "status": "ready"
     },
     "inline": {
       "note-1": {
-        "file": "assets/media/launching-munder-difflin-v0-4-6/note-1.png",
-        "alt": "Hand-drawn sketch from “Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now”",
+        "file": "assets/media/how-to-install-gemini-cli/note-1.png",
+        "alt": "Hand-drawn sketch from “How to Install Gemini CLI, and Who Can Still Use It in 2026”",
         "prompt": "",
         "status": "ready"
       },
       "note-2": {
-        "file": "assets/media/launching-munder-difflin-v0-4-6/note-2.png",
-        "alt": "Hand-drawn sketch from “Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now”",
+        "file": "assets/media/how-to-install-gemini-cli/note-2.png",
+        "alt": "Hand-drawn sketch from “How to Install Gemini CLI, and Who Can Still Use It in 2026”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "aider-vs-claude-code": {
+    "title": "Aider vs Claude Code in 2026: Which Should You Use?",
+    "category": "comparisons",
+    "hero": {
+      "file": "assets/media/aider-vs-claude-code/hero.png",
+      "alt": "Illustration: Aider vs Claude Code in 2026: Which Should You Use?",
+      "prompt": "Hero image for a blog post titled \"Aider vs Claude Code in 2026: Which Should You Use?\". The post is about: Aider vs Claude Code, checked 15 Sep 2026: how each edits code, which models it runs, what it costs, MCP, and Aider's stalled releases.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/aider-vs-claude-code/note-1.png",
+        "alt": "Hand-drawn sketch from “Aider vs Claude Code in 2026: Which Should You Use?”",
         "prompt": "",
         "status": "ready"
       },
-      "note-3": {
-        "file": "assets/media/launching-munder-difflin-v0-4-6/note-3.png",
-        "alt": "Hand-drawn sketch from “Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now”",
+      "note-2": {
+        "file": "assets/media/aider-vs-claude-code/note-2.png",
+        "alt": "Hand-drawn sketch from “Aider vs Claude Code in 2026: Which Should You Use?”",
+        "prompt": "",
+        "status": "ready"
+      }
+    },
+    "youtube": []
+  },
+  "is-ollama-good-for-coding": {
+    "title": "Is Ollama Good for Coding? What Local Models Can and Can't Do",
+    "category": "concepts",
+    "hero": {
+      "file": "assets/media/is-ollama-good-for-coding/hero.png",
+      "alt": "Illustration: Is Ollama Good for Coding? What Local Models Can and Can't Do",
+      "prompt": "Hero image for a blog post titled \"Is Ollama Good for Coding? What Local Models Can and Can't Do\". The post is about: Ollama only runs the model, so the answer depends on which one you pull and your memory. What local models do well, where Claude wins, and a verdict.",
+      "status": "ready"
+    },
+    "inline": {
+      "note-1": {
+        "file": "assets/media/is-ollama-good-for-coding/note-1.png",
+        "alt": "Hand-drawn sketch from “Is Ollama Good for Coding? What Local Models Can and Can't Do”",
+        "prompt": "",
+        "status": "ready"
+      },
+      "note-2": {
+        "file": "assets/media/is-ollama-good-for-coding/note-2.png",
+        "alt": "Hand-drawn sketch from “Is Ollama Good for Coding? What Local Models Can and Can't Do”",
         "prompt": "",
         "status": "ready"
       }

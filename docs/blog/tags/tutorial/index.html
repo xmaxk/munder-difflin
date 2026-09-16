@@ -1,6 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js), Google Ads AW-18388216863. Loaded only when Do Not Track is
+     off, so it follows the same rule as the PostHog block on this site. -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  if (navigator.doNotTrack !== '1') {
+    var gtagScript = document.createElement('script');
+    gtagScript.async = true;
+    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18388216863';
+    document.head.appendChild(gtagScript);
+    gtag('js', new Date());
+    gtag('config', 'AW-18388216863');
+  }
+</script>
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Tutorial — Munder Difflin Blog</title>
@@ -100,13 +115,13 @@
     <div class="meta">
       <time datetime="2026-06-22">Jun 22, 2026</time>
       <span class="dot" aria-hidden="true"></span>
-      <span>8 min</span>
+      <span>6 min</span>
     </div>
-    <h3><a href="/blog/run-munder-difflin-on-open-models/">Run Munder Difflin on Open-Source Models — Fully Local or via a Third-Party Provider</a></h3>
-    <p class="dek">Munder Difflin runs your agent floor on open-weight models — gpt-oss, Qwen3, DeepSeek, Llama, Mistral, GLM, Kimi — fully local (Ollama/LM Studio/vLLM), through a third-party OSS provider, or on the model-maker&#39;s own CLI. Here&#39;s the wiring, current as of v0.4.4.</p>
+    <h3><a href="/blog/run-munder-difflin-on-open-models/">Run Munder Difflin on Open Source Models: Fully Local or Through a Provider</a></h3>
+    <p class="dek">Munder Difflin can run your whole agent floor on open weight models like gpt-oss, Qwen3, DeepSeek, Llama, GLM and Kimi: fully local with Ollama, LM Studio or vLLM, or through a provider with your own key. The wiring for each engine, current as of 0.5.2.</p>
     <div class="foot">
       <span class="tag kind">Guides</span>
-      <a class="more" href="/blog/run-munder-difflin-on-open-models/" aria-label="Read: Run Munder Difflin on Open-Source Models — Fully Local or via a Third-Party Provider">Read →</a>
+      <a class="more" href="/blog/run-munder-difflin-on-open-models/" aria-label="Read: Run Munder Difflin on Open Source Models: Fully Local or Through a Provider">Read →</a>
     </div>
   </div>
 </article>
@@ -116,10 +131,10 @@
     <div class="meta">
       <time datetime="2026-06-05">Jun 5, 2026</time>
       <span class="dot" aria-hidden="true"></span>
-      <span>14 min</span>
+      <span>14 min</span><span class="pin">Pinned</span>
     </div>
     <h3><a href="/blog/how-to-install-and-use-munder-difflin/">How to Install and Use Munder Difflin: A Beginner&#39;s Guide</a></h3>
-    <p class="dek">A plain-language guide to Munder Difflin v0.4.6. What a coding agent is, which AI engine to pick based on what you already pay for, the one terminal command you&#39;ll ever run, and how to install and set it up on macOS, Windows or Linux.</p>
+    <p class="dek">A plain language guide to Munder Difflin 0.5.2. What a coding agent is, which AI engine to pick based on what you already pay for, the one terminal command you&#39;ll ever run, and how to install and set it up on macOS, Windows or Linux.</p>
     <div class="foot">
       <span class="tag kind">Guides</span>
       <a class="more" href="/blog/how-to-install-and-use-munder-difflin/" aria-label="Read: How to Install and Use Munder Difflin: A Beginner&#39;s Guide">Read →</a>

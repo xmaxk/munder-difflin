@@ -54,6 +54,25 @@ export default function (eleventyConfig) {
       .sort((a, b) => b.date - a.date)
   );
 
+  // Pinned pillar guides (`pinned: true`), in `pinOrder`. They sit above the
+  // newest post on the index and first on their topic page, so a fast publishing
+  // pace never pushes the reference guides off the top.
+  const pinRank = (p) => (p.data.pinned ? (p.data.pinOrder ?? 99) : 1e9);
+  eleventyConfig.addCollection("pinned", (api) =>
+    api
+      .getFilteredByGlob("src/posts/*.md")
+      .filter((p) => !p.data.draft && p.data.pinned)
+      .sort((a, b) => pinRank(a) - pinRank(b) || b.date - a.date)
+  );
+
+  // Everything else, newest first: the index features the first of these.
+  eleventyConfig.addCollection("unpinned", (api) =>
+    api
+      .getFilteredByGlob("src/posts/*.md")
+      .filter((p) => !p.data.draft && !p.data.pinned)
+      .sort((a, b) => b.date - a.date)
+  );
+
   // Topic clusters (categories) — derived from each post's `category` field.
   eleventyConfig.addCollection("categories", (api) => {
     const map = {};
@@ -67,7 +86,7 @@ export default function (eleventyConfig) {
       .map(([name, posts]) => ({
         name,
         slug: slugify(name),
-        posts: posts.sort((a, b) => b.date - a.date),
+        posts: posts.sort((a, b) => pinRank(a) - pinRank(b) || b.date - a.date),
       }))
       .sort((a, b) => b.posts.length - a.posts.length);
   });
@@ -220,6 +239,23 @@ export default function (eleventyConfig) {
   eleventyConfig.addFilter("heroReady", (slug) => media[slug]?.hero?.status === "ready");
   eleventyConfig.addFilter("heroFile", (slug) => media[slug]?.hero?.file || "");
   eleventyConfig.addFilter("heroAlt", (slug) => media[slug]?.hero?.alt || "");
+
+  // Link preview (og:image / twitter:image) for a post: its own hero once it is
+  // ready, so a shared link shows the post's picture instead of the site default.
+  // Width and height come from the PNG header so Facebook and LinkedIn can draw
+  // the card on the first share without fetching the file first.
+  eleventyConfig.addFilter("heroOg", (slug) => {
+    const hero = media[slug]?.hero;
+    if (hero?.status !== "ready" || !hero.file) return false;
+    const png = readFileSync(`src/${hero.file}`);
+    const isPng = png.toString("ascii", 12, 16) === "IHDR";
+    return {
+      path: `${BASE}/${hero.file}`,
+      alt: hero.alt || "",
+      width: isPng ? png.readUInt32BE(16) : 0,
+      height: isPng ? png.readUInt32BE(20) : 0,
+    };
+  });
 
   // ---- config ----
   return {

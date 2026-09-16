@@ -1,11 +1,13 @@
 ---
 title: "How to Install and Use Munder Difflin: A Beginner's Guide"
-description: "A plain-language guide to Munder Difflin v0.4.6. What a coding agent is, which AI engine to pick based on what you already pay for, the one terminal command you'll ever run, and how to install and set it up on macOS, Windows or Linux."
+description: "A plain language guide to Munder Difflin 0.5.2. What a coding agent is, which AI engine to pick based on what you already pay for, the one terminal command you'll ever run, and how to install and set it up on macOS, Windows or Linux."
 date: 2026-06-05
-updated: 2026-08-27
+updated: 2026-09-10
 category: guides
 categoryLabel: Guides
 type: Non-technical
+pinned: true
+pinOrder: 1
 primaryKeyword: "how to install munder difflin"
 secondaryKeywords: ["munder difflin download", "munder difflin setup", "what is a coding agent", "munder difflin windows", "free ai coding agent", "antigravity free", "munder difflin beginner guide"]
 tags: ["Guides", "Getting Started", "Tutorial", "Non-Technical", "Automation"]
@@ -16,11 +18,11 @@ faq:
   - q: "Do I need to know how to code to use Munder Difflin?"
     a: "No. The onboarding asks whether you are technical or not on its very first screen, and the non-technical path replaces every piece of jargon with plain language. You will open a terminal exactly once, to install and log into your AI engine, and you can copy and paste those commands."
   - q: "Does Munder Difflin cost anything?"
-    a: "The app is free and open source. What you may pay for is the AI engine behind it. Antigravity is available at no charge and OpenCode has a free path, so you can run the whole thing without paying anything. If you already pay for ChatGPT or Claude, you can use those subscriptions instead."
+    a: "The classic app is free and open source, with unlimited local agents. Pro and Teams are optional paid plans with a 14 day trial. What you may pay for is the AI engine behind it. Antigravity is available at no charge and OpenCode has a free path, so you can run the whole thing without paying anything. If you already pay for ChatGPT or Claude, you can use those subscriptions instead."
   - q: "Can these agents really change files on my computer?"
     a: "Yes, and that is the point, so it is worth understanding before you start. An agent can read files, write files and run commands in the folders you give it. You choose how much freedom it has during setup, and you can set it to ask permission before every change."
   - q: "Which operating systems does Munder Difflin run on?"
-    a: "macOS, Windows and Linux. macOS ships as a .dmg, Windows as an installer and a portable build, and Linux as an AppImage and a .deb."
+    a: "macOS, Windows and Linux. macOS ships as one universal .dmg for Apple Silicon and Intel, Windows 10 and 11 as a setup installer or a portable build, and Linux as an AppImage."
   - q: "Is my code or data sent anywhere?"
     a: "The app runs on your machine and stores its files there. Your prompts and the files an agent reads do go to whichever AI engine you picked, the same as if you used that tool directly. Anonymous usage telemetry is opt-out and every event is listed publicly in TELEMETRY.md."
 ---
@@ -44,7 +46,8 @@ working on something you asked for. One of them is your clone, the boss of the f
 you ask for, breaks it into jobs, and hands those jobs to the others. You talk to your clone, and
 your clone manages everyone else.
 
-The app is free and open source. It runs on your machine, and it keeps its files on your machine.
+The app is free and open source. It runs on your machine, and it keeps its files on your machine. There are
+optional paid plans, Pro and Teams, but nothing in this guide needs them.
 
 The thing it is not: a chatbot. You are not sitting there typing and waiting for replies. You give
 your clone a job, close the laptop, and come back to work that was done while you were gone.
@@ -279,16 +282,19 @@ straight from the
 
 {% img "shot-download", "The download page. Pick the file that matches your computer." %}
 
-**macOS.** Download the `.dmg`. Open it, drag Munder Difflin into Applications. The first time you
-open it, macOS may say it cannot verify the developer. Right-click the app icon, choose Open, then
-click Open in the dialog. You only do this once.
+**macOS.** Download the universal `.dmg`, which runs on Apple Silicon and Intel. Open it and drag
+Munder Difflin into Applications. The app is signed and notarized by Apple, so the first launch only
+shows the usual question about opening an app downloaded from the internet. Click Open.
 
-**Windows.** Download the `.exe` installer and run it. Windows SmartScreen will likely warn you,
-because the installer is not yet EV code signed. Click More info, then Run anyway. If the installer
-fails to start at all, download the portable build instead, which needs no installation.
+**Windows.** Download the setup `.exe` and run it. If Windows SmartScreen shows a warning, click
+More info, then Run anyway. If the installer will not start at all, download the portable `.exe`
+from the release instead, which needs no installation.
 
-**Linux.** Download the `AppImage`, make it executable (`chmod +x` on the file) and run it. There is
-a `.deb` if you prefer to install it properly.
+**Linux.** Download the `.AppImage`, make it executable (`chmod +x` on the file) and run it.
+
+**Want to be sure the file is genuine?** Every release carries a `SHA256SUMS.txt`. Run
+`shasum -a 256` on the file you downloaded (or `Get-FileHash` in Windows PowerShell) and check that
+the value matches that file's line.
 
 ## Step 4: Onboarding, six screens
 
@@ -434,10 +440,11 @@ it alone. The default is sensible and most people never touch it.
 Seven sections. These are the ones that matter early:
 
 - **General.** Change your home folder, switch between technical and plain language, pick your
-  language. As of v0.4.6 the app runs in English, Chinese and Arabic.
+  language. The app runs in English, Simplified Chinese and Arabic.
 - **Prerequisites.** Checks whether your engines are actually installed and logged in. **This is the
   first place to look when something is not working.**
-- **Agents & Models.** Which engines are available and which models each uses.
+- **Agents & Models.** Which engines are available and which models each uses. New models show up
+  without an app update, because the model pickers read the latest list when the app launches.
 - **Autonomy & Budgets.** The permission choice from onboarding, plus spending limits per agent.
   Worth setting a cap before leaving anything running overnight.
 - **Connections.** Slack, webhooks, MCP and the REST API.
@@ -464,10 +471,11 @@ sign-in.
 **"Engine not installed" during onboarding, but you installed it.** The app looks for the command on
 your system path. Close the app completely and reopen it, since it reads your environment at launch.
 
-**Windows blocks the installer.** SmartScreen flags it because the installer is not EV code signed.
-Choose More info, then Run anyway, or use the portable build.
+**Windows blocks the installer.** If SmartScreen flags it, choose More info, then Run anyway, or use
+the portable build.
 
-**macOS says the developer cannot be verified.** Right-click the app, choose Open, then Open again.
+**macOS asks whether to open an app downloaded from the internet.** That is normal for anything you
+download. Click Open.
 
 **Nothing is happening.** Check whether message delivery is paused in the Command Center. Paused
 means queued work is being held for every agent, and nothing is lost when you switch it back on.

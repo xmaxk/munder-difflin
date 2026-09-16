@@ -57,7 +57,7 @@ agent inside it. A harness wraps the agent you already run — which is the core
 
 MCP (Model Context Protocol) servers extend an agent with external tools and data — your database, your
 issue tracker, your internal APIs. Claude Code resolves MCP servers from configuration: user-scoped
-servers you've set up globally, and project-scoped servers defined in the project you're working in.
+servers you've set up globally, and project-scoped servers defined in the project you're working in. If you haven't set one up yet, [our guide to adding an MCP server to Claude Code](/blog/how-to-add-an-mcp-server-to-claude-code/) walks through the `claude mcp add` command and its scope flags.
 Because a hive agent runs as a real session in that project, it picks up both. Every agent in the hive
 can call the same MCP tools you'd have in a solo session — no per-agent re-registration.
 

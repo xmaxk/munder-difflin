@@ -1,6 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js), Google Ads AW-18388216863. Loaded only when Do Not Track is
+     off, so it follows the same rule as the PostHog block on this site. -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  if (navigator.doNotTrack !== '1') {
+    var gtagScript = document.createElement('script');
+    gtagScript.async = true;
+    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18388216863';
+    document.head.appendChild(gtagScript);
+    gtag('js', new Date());
+    gtag('config', 'AW-18388216863');
+  }
+</script>
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Our Agents Ran Our Launch-Week Analytics — Munder Difflin Blog</title>
@@ -17,7 +32,10 @@
 <meta property="og:title" content="Our Agents Ran Our Launch-Week Analytics — Munder Difflin Blog" />
 <meta property="og:description" content="Ten Reddit threads, a Product Hunt page, GitHub traffic and PostHog funnels — every comment read, cross-referenced, and reported by a hive of agents. The workflow, and how to point it at your own launch." />
 <meta property="og:url" content="https://munderdiffl.in/blog/agents-ran-our-launch-week-analytics/" />
-<meta property="og:image" content="https://munderdiffl.in/media/og.png" />
+<meta property="og:image" content="https://munderdiffl.in/blog/assets/media/agents-ran-our-launch-week-analytics/hero.png" />
+<meta property="og:image:width" content="1600" />
+<meta property="og:image:height" content="904" />
+<meta property="og:image:alt" content="Illustration: Our Agents Ran Our Launch-Week Analytics" />
 <meta property="og:locale" content="en_US" />
 <meta property="article:published_time" content="2026-08-19T00:00:00.000Z" />
 <meta property="article:author" content="Chaitanya Giri" />
@@ -32,7 +50,8 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Our Agents Ran Our Launch-Week Analytics — Munder Difflin Blog" />
 <meta name="twitter:description" content="Ten Reddit threads, a Product Hunt page, GitHub traffic and PostHog funnels — every comment read, cross-referenced, and reported by a hive of agents. The workflow, and how to point it at your own launch." />
-<meta name="twitter:image" content="https://munderdiffl.in/media/og.png" />
+<meta name="twitter:image" content="https://munderdiffl.in/blog/assets/media/agents-ran-our-launch-week-analytics/hero.png" />
+<meta name="twitter:image:alt" content="Illustration: Our Agents Ran Our Launch-Week Analytics" />
 
 <link rel="alternate" type="application/atom+xml" title="Munder Difflin Blog" href="https://munderdiffl.in/blog/feed.xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,7 +65,7 @@
   "@type": "BlogPosting",
   "headline": "Our Agents Ran Our Launch-Week Analytics",
   "description": "Ten Reddit threads, a Product Hunt page, GitHub traffic and PostHog funnels — every comment read, cross-referenced, and reported by a hive of agents. The workflow, and how to point it at your own launch.",
-  "image": ["https://munderdiffl.in/media/og.png"],
+  "image": ["https://munderdiffl.in/blog/assets/media/agents-ran-our-launch-week-analytics/hero.png"],
   "datePublished": "2026-08-19T00:00:00.000Z",
   "dateModified": "2026-08-19T00:00:00.000Z",
   "author": { "@type": "Person", "name": "Chaitanya Giri" },

@@ -67,7 +67,7 @@ shipping bigger work. The "one tool wins everything" framing is over.
 **Cursor** — a dedicated AI-first IDE that leads on in-editor agent ergonomics; reference pricing runs
 [~$20 (Pro) to $200 (Ultra)/mo](https://www.developersdigest.tech/blog/ai-coding-tools-pricing-2026)
 with partial bring-your-own-model. If you want the smoothest in-editor experience and don't mind a
-dedicated app, it's the benchmark.
+dedicated app, it's the benchmark. Our [Claude Code vs Cursor](/blog/claude-code-vs-cursor/) comparison goes deeper on that choice.
 
 **Cline** — a free, open VS Code extension; the standout for **local / bring-your-own-key** (run on
 your API keys or free local models via Ollama), and per 2026 roundups
@@ -76,7 +76,7 @@ if you want a Cursor-like agent inside VS Code without a subscription. (We compa
 [Cline vs Munder Difflin](/blog/cline-vs-munder-difflin/).)
 
 **Aider** — the open-source, git-native **CLI** agent: free, you pay only model API costs, auto-commits
-as it works. Best for terminal-centric, version-control-disciplined workflows.
+as it works. Best for terminal-centric, version-control-disciplined workflows. Check its pulse first, though: its last release shipped in February 2026, and [Aider vs Claude Code](/blog/aider-vs-claude-code/) has the details.
 
 **Devin** (Cognition) — the most **autonomous** option: give it a task and it plans, codes, tests, and
 opens a PR in its own cloud workspace. [Its price dropped from $500 to ~$20/mo](https://www.mgsoftware.nl/en/vergelijking/devin-vs-github-copilot-workspace)
@@ -86,6 +86,8 @@ needs human review.
 **GitHub Copilot agent mode** — went **multi-model** in Feb 2026 (Claude + Codex backends) and shipped
 a Copilot CLI with specialized sub-agents (Explore/Task/Code Review/Plan); Copilot Workspace keeps a
 human-approves-each-step philosophy. Best if your team already lives in GitHub.
+
+Licences differ across this list, and Claude Code's surprises people: a public GitHub repo, but not open source. Details in [is Claude Code open source](/blog/is-claude-code-open-source/).
 
 ## Where a local multi-agent hive fits
 
@@ -112,7 +114,7 @@ enough. If that's your need specifically with Claude Code, the
 
 For a structured rubric across all of these, see [how to choose a multi-agent tool](/blog/how-to-choose-a-multi-agent-tool/);
 for two head-to-heads, [Cline vs](/blog/cline-vs-munder-difflin/) and
-[Claude Squad vs Munder Difflin](/blog/claude-squad-vs-munder-difflin/).
+[Claude Squad vs Munder Difflin](/blog/claude-squad-vs-munder-difflin/). Choosing between two terminal agents? [Codex CLI vs Claude Code](/blog/codex-cli-vs-claude-code/) compares them head to head.
 
 ## The bottom line
 

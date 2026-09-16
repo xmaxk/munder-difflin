@@ -45,15 +45,27 @@ permalink: /index.html
 </header>
 
 {% if posts.length %}
+{%- set rest = collections.unpinned -%}
+{% if collections.pinned.length %}
+<section class="wrap pinned" aria-labelledby="pinned-title">
+  <h2 class="pinned-title" id="pinned-title">Start here</h2>
+  <div class="post-grid">
+    {% for p in collections.pinned %}{% include "card.njk" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if rest.length %}
 <div class="wrap featured">
-  {%- set p = posts[0] -%}
+  {%- set p = rest[0] -%}
   {% include "card.njk" %}
 </div>
+{% endif %}
 
-{% if posts.length > 1 %}
+{% if rest.length > 1 %}
 <section class="wrap">
   <div class="post-grid">
-    {% for p in posts %}{% if not loop.first %}{% include "card.njk" %}{% endif %}{% endfor %}
+    {% for p in rest %}{% if not loop.first %}{% include "card.njk" %}{% endif %}{% endfor %}
   </div>
 </section>
 {% endif %}

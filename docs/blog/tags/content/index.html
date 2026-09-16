@@ -1,6 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js), Google Ads AW-18388216863. Loaded only when Do Not Track is
+     off, so it follows the same rule as the PostHog block on this site. -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  if (navigator.doNotTrack !== '1') {
+    var gtagScript = document.createElement('script');
+    gtagScript.async = true;
+    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18388216863';
+    document.head.appendChild(gtagScript);
+    gtag('js', new Date());
+    gtag('config', 'AW-18388216863');
+  }
+</script>
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Content — Munder Difflin Blog</title>
@@ -100,13 +115,13 @@
     <div class="meta">
       <time datetime="2026-06-10">Jun 10, 2026</time>
       <span class="dot" aria-hidden="true"></span>
-      <span>6 min</span>
+      <span>5 min</span>
     </div>
-    <h3><a href="/blog/deploy-a-blog-writer-agent/">Deploy a Blog-Writer Agent: The One That Wrote This Post</a></h3>
-    <p class="dek">How Munder Difflin&#39;s blog is written by an automated writer agent in the hive — drafts in a worktree, single-committer integration, Eleventy build, human-gated deploy, and now hand-drawn illustrations from the same office. Build your own.</p>
+    <h3><a href="/blog/deploy-a-blog-writer-agent/">Deploy a Blog Writer Agent: The One That Wrote This Post</a></h3>
+    <p class="dek">How the Munder Difflin blog is written by agents in our own office: a brief, a house style, a draft in its own worktree, drawings made in code, a pull request, and one human merge. The pipeline, and how to build your own.</p>
     <div class="foot">
       <span class="tag kind">Use Cases</span>
-      <a class="more" href="/blog/deploy-a-blog-writer-agent/" aria-label="Read: Deploy a Blog-Writer Agent: The One That Wrote This Post">Read →</a>
+      <a class="more" href="/blog/deploy-a-blog-writer-agent/" aria-label="Read: Deploy a Blog Writer Agent: The One That Wrote This Post">Read →</a>
     </div>
   </div>
 </article>

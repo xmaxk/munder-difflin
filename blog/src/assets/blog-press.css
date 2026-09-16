@@ -289,6 +289,9 @@ a.tag:hover { background: var(--ink); color: var(--paper); }
 .pn .t { font-family: var(--disp); font-weight: 700; line-height: 1.25; }
 .related h2 { font-family: var(--disp); font-weight: 900; font-size: 1.7rem; border-top: 4px solid var(--rule); padding-top: 16px; }
 .related .post-grid { padding: 0; }
+.pinned-title { font-family: var(--disp); font-weight: 900; font-size: 1.7rem; border-top: 4px solid var(--rule); padding-top: 16px; margin: 30px 0 0; }
+.pinned .post-grid { padding-bottom: 28px; }
+.card .meta .pin { background: var(--accent); color: var(--ink); padding: 2px 8px; letter-spacing: 0.08em; }
 
 /* footer (site footer only — .post-foot must stay on the light page ground) */
 footer.site-foot { background: var(--ink); color: var(--paper); margin-top: 48px; }

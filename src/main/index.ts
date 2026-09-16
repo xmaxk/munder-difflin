@@ -28,6 +28,7 @@ import {
   addWorktree, removeWorktree, worktreeHasUnintegratedWork, worktreeIsGcSafe,
   getLogGraph, getCommitFiles, getFileAtRev, compareRefs, listWorktrees, checkoutRef
 } from './git';
+import { linkWorktreeDeps, unlinkWorktreeDeps } from './worktreeDeps';
 import { HiveManager, type AgentMeta, type HiveMessage, type HiveTask } from './hive';
 import { HookServer } from './hooks';
 import { CircuitBreaker, type BreakerInput } from './breaker';
@@ -87,6 +88,7 @@ import { detectNodeVersion, nodeIsUsable, resolveNodeInstaller } from './nodeIns
 import { toolCatalog, type ToolStatus } from '../shared/toolCatalog';
 import { listLocalSkills, loadCatalog, installSkill, uninstallSkill, type LocalSkill } from './skills';
 import { loadHero } from './hero';
+import { loadModelCatalog } from './modelCatalog';
 import {
   CODEX_REMOTE_SOCKET_RELATIVE,
   codexRemoteAliasPath,
@@ -571,6 +573,8 @@ function resolvePalaceHub(): { url: string; token: string } | undefined {
  *  (fail-safe — never auto-discard possibly-valuable work). */
 async function finalizeWorkerWorktree(wtPath: string, origCwd: string, worker: WorkerRec): Promise<void> {
   try {
+    const deps = await unlinkWorktreeDeps(origCwd, wtPath);
+    if (!deps.ok) console.error('[worktree] dependency unlink failed:', deps.error);
     const work = await worktreeHasUnintegratedWork(wtPath, worker.baseBranch);
     if (work.keep) {
       console.warn(`[worker] PRESERVING worktree with unintegrated work: ${wtPath} (${work.detail})`);
@@ -634,7 +638,23 @@ function removeWorkerScratch(workerId: string): void {
 // SAME pty/window (no user click). Provider-agnostic. Idempotent by construction: the
 // relaunch carries `noAutoInstall`, so the installer can never fire (let alone loop) a
 // second time — a binary that's somehow still missing just spawns and exits normally.
-ptyManager.setExitHandler((id, exitCode) => {
+ptyManager.setExitHandler((id, exitCode, info) => {
+  // Record an ABNORMAL death before teardown — teardownPty drops the
+  // pty->agent mapping, so after it runs we can no longer say WHOSE process
+  // died. Only abnormal exits are recorded (recordAgentExit returns early on a
+  // clean one), so this adds no noise to a normal archive.
+  try {
+    const dyingAgent = ptyToAgent.get(id);
+    if (dyingAgent) {
+      hive.recordAgentExit(dyingAgent, {
+        exitCode,
+        signal: info?.signal,
+        tail: info?.tail,
+        command: info?.command
+      });
+    }
+  } catch (e) { console.error('[pty] recordAgentExit failed:', e); }
+
   const pending = pendingInstallRelaunch.get(id);
   if (pending) {
     pendingInstallRelaunch.delete(id);
@@ -1088,6 +1108,47 @@ function lastCoordinationAt(agentId: string): number {
   return Math.max(...times);
 }
 
+/** Newest mtime of the agent's OWN WORKING DIRECTORY — the work
+ *  `lastCoordinationAt` cannot see. 0 when there is nothing to read.
+ *
+ *  Provider neutral by construction: `cwd` is the agent's registry entry, the
+ *  same field every supported CLI is spawned into, and none of the paths below
+ *  is specific to any one of them. An agent whose `cwd` is not a git checkout
+ *  simply falls back to the directory's own mtime; an agent with no `cwd` at
+ *  all returns 0 and behaves exactly as it does today.
+ *
+ *  Cheap by construction: a handful of `stat` calls on fixed paths, never a
+ *  directory walk. This runs for every agent on every beat, and a working
+ *  directory can hold hundreds of thousands of files. Git is what makes it
+ *  affordable — each of these is rewritten by ordinary work:
+ *
+ *    cwd                  a file or directory added or removed at the top level
+ *    .git/index           any `git add`, `git status`, `git checkout`
+ *    .git/logs/HEAD       the reflog: commit, checkout, reset, merge, rebase
+ *    .git/FETCH_HEAD      fetch and pull
+ *    .git/packed-refs     and `.git/refs/remotes`: a push updating a tracking ref
+ *
+ *  Its honest limit: editing a file deep in the tree while running no git
+ *  command moves none of these. That case is already covered by the breaker's
+ *  own distinct-tool clock, so the two signals are complementary rather than
+ *  redundant — this one exists for the window where tool events do not reach
+ *  the breaker but the work is unmistakably real.
+ */
+function lastWorkAt(agentId: string): number {
+  const cwd = hive.registry().agents[agentId]?.cwd;
+  if (!cwd) return 0;
+  const times: number[] = [0];
+  const pushMtime = (p: string): void => { try { times.push(statSync(p).mtimeMs); } catch { /* missing */ } };
+  pushMtime(cwd);
+  const git = join(cwd, '.git');
+  pushMtime(join(git, 'index'));
+  pushMtime(join(git, 'logs', 'HEAD'));
+  pushMtime(join(git, 'FETCH_HEAD'));
+  pushMtime(join(git, 'refs', 'remotes'));
+  pushMtime(join(git, 'packed-refs'));
+  return Math.max(...times);
+}
+
 /** PTY id owning a given agent id, or undefined. */
 function ptyForAgent(agentId: string): string | undefined {
   for (const [ptyId, a] of ptyToAgent) if (a === agentId) return ptyId;
@@ -1228,7 +1289,10 @@ function runBreakerBeat(progressWindowMs: number): void {
     inputs.push({
       agentId: id,
       sample,
-      progressing: now - lastCoordinationAt(id) < progressWindowMs || now - lastSpanAt < progressWindowMs
+      progressing: now - lastCoordinationAt(id) < progressWindowMs || now - lastSpanAt < progressWindowMs,
+      // Work, as distinct from coordination. The breaker decides what to do
+      // with it; the beat only reports it.
+      lastWorkAt: lastWorkAt(id)
     });
   }
   for (const d of breaker.tick(inputs, now)) {
@@ -2744,6 +2808,8 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
           opts.cwd = wtPath;
           worktreePaths.set(opts.id, wtPath);
           worktreeOrigins.set(opts.id, origCwd);
+          const deps = await linkWorktreeDeps(origCwd, wtPath);
+          if (!deps.ok) console.error('[worktree] dependency link failed:', deps.error);
         } else {
           console.error('[worktree] addWorktree failed:', wt.error);
         }
@@ -3669,6 +3735,14 @@ ipcMain.handle('hive:patchAgentRole', (_evt, id: unknown, role: unknown) => {
 ipcMain.handle('hero:payload', async (_evt, force: unknown) =>
   loadHero(join(app.getPath('userData'), 'hero.json'), { force: force === true }));
 
+// ─── IPC: model catalog (remote data, cached) ───────────────────────────────
+/** The agent model presets, fetched from docs/model-catalog.json on main so a
+ *  new model reaches installed copies without a release. Validated in
+ *  shared/modelCatalogPayload; a null catalog means "keep the baked one". */
+const MODEL_CATALOG_CACHE = () => join(app.getPath('userData'), 'model-catalog.json');
+ipcMain.handle('models:catalog', async (_evt, force: unknown) =>
+  loadModelCatalog(MODEL_CATALOG_CACHE(), { force: force === true }));
+
 // ─── IPC: skills (installed locally, and the browsable catalog) ─────────────
 /** Skills the CLIs on this machine can already use. Scans the registered repos
  *  plus the agent's own cwd, so a project-scoped skill shows up where it applies. */
@@ -4182,9 +4256,11 @@ ipcMain.handle('app:setNotifications', (_evt, val) => writeConfig({ notification
 // ─── IPC: onboarding reliability — open Settings deep-link + login-item toggle ─
 /** Open a System Settings deep-link (or https URL) in the OS default handler.
  *  Restricted to Settings panes / https so the renderer can't shell arbitrary
- *  schemes. Used by the onboarding "Permissions & reliability" step. */
+ *  schemes. macOS uses `x-apple.systempreferences:`, Windows uses `ms-settings:`
+ *  (Linux has no universal settings URI, so the renderer never sends one there).
+ *  Used by the onboarding "Permissions & reliability" step. */
 ipcMain.handle('app:openExternal', async (_evt, url: unknown) => {
-  if (typeof url !== 'string' || !/^(x-apple\.systempreferences:|https:\/\/)/.test(url)) {
+  if (typeof url !== 'string' || !/^(x-apple\.systempreferences:|ms-settings:|https:\/\/)/.test(url)) {
     return { ok: false, error: 'blocked url' };
   }
   await shell.openExternal(url);
@@ -4199,7 +4275,24 @@ ipcMain.handle('app:setLoginItem', (_evt, enabled: unknown) => {
 
 // ─── IPC: Slack integration ─────────────────────────────────────────────────
 ipcMain.handle('slack:start', () => startSlackServer());
-ipcMain.handle('slack:stop', () => { stopSlackServer(); return { ok: true }; });
+/** Stop must survive a restart. Boot re-arms from `slackEnabled`, so stopping
+ *  without clearing it silently brought the server back on the next launch —
+ *  the user pressed Stop and Slack was live again.
+ *
+ *  Persist BEFORE tearing down. If the write throws (read-only volume, ENOSPC)
+ *  the server is still up and the UI stays truthful; the other order leaves a
+ *  dead server that still reads as Connected with the flag set, which is this
+ *  same bug again with no error to show for it.
+ *
+ *  Only this handler clears the flag. changeHome / quit / reset call
+ *  `stopSlackServer()` directly and must not: they are lifecycle, not a user
+ *  turning the integration off. (Start persists the flag from the renderer, in
+ *  `SettingsModal.startSlack`, not here.) */
+ipcMain.handle('slack:stop', () => {
+  writeConfig({ slackEnabled: false });
+  stopSlackServer();
+  return { ok: true };
+});
 /** Current connection state + last Request URL — lets Settings hydrate the
  *  "Connected" badge and re-show the persisted tunnel URL on reopen. */
 ipcMain.handle('slack:status', () => ({ running: slackServer != null, url: lastSlackUrl }));
@@ -4567,7 +4660,9 @@ registerRealtimeActionIpc({
   hiveEnabled: () => hive.enabled(),
   hiveSend: (partial, from) => hive.send(partial, from),
   hiveTasks: () => hive.tasks(),
-  hiveWriteTasks: (tasks) => hive.writeTasks(tasks),
+  hiveAddTask: (task) => hive.addTask(task as HiveTask),
+  hivePatchTask: (id, patch) => hive.patchTask(id, patch as Partial<Omit<HiveTask, 'id'>>),
+  hiveDeleteTask: (id) => hive.deleteTask(id),
   hiveRegistry: () => hive.registry(),
   hiveLog: (event) => hive.appendLog(event),
   controlPause: (id, on) => control.pause(id, on),
@@ -5003,6 +5098,8 @@ async function gcPreservedWorktrees(): Promise<void> {
         continue;
       }
       // (b) Still on disk → reclaim ONLY when provably integrated + clean.
+      const deps = await unlinkWorktreeDeps(e.origCwd, e.wtPath);
+      if (!deps.ok) { console.error('[worker gc] dependency unlink failed (keeping):', deps.error); continue; }
       let safe: { gc: boolean; detail: string };
       try { safe = await worktreeIsGcSafe(e.wtPath, e.baseBranch); }
       catch (err) { console.error('[worker gc] gc-safe check threw (keeping):', err); continue; }
@@ -5368,7 +5465,7 @@ function runWorkerWakeBeat(): void {
       isGod: agentId === reg.godId,
       ptyId,
       lastOutputAt: ptyManager.lastOutputAt(ptyId) ?? 0,
-      inboxCount: hive.inbox(agentId).length,
+      inboxIds: hive.inbox(agentId).map((message) => message.id).filter(Boolean),
       autoDeliveryPaused: snap.autoDeliveryPaused,
       paused: snap.paused,
       halted: snap.halted
@@ -5527,6 +5624,12 @@ app.whenReady().then(() => {
     appVersion: app.getVersion(),
     enabled: readConfig().telemetryEnabled !== false
   });
+
+  // Warm the model catalog cache before any picker opens. The renderer reads
+  // the same cache over IPC on load; doing the network hop here means the file
+  // is already fresh on disk by the time a modal is opened, and a failure is
+  // silent by construction (the baked catalog is the floor).
+  void loadModelCatalog(MODEL_CATALOG_CACHE()).catch(() => { /* never fatal */ });
 
   // A cold-start deep link (Windows/Linux) rides in on OUR argv.
   const startupHireLink = process.argv.find((a) => a.startsWith('munderdifflin://'));

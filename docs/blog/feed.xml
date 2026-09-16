@@ -4,9 +4,201 @@
   <subtitle>Guides, deep dives, and comparisons on running multi-agent Claude Code: orchestration, agent memory, automation, and the tooling landscape.</subtitle>
   <link href="https://munderdiffl.in/blog/feed.xml" rel="self" />
   <link href="https://munderdiffl.in/blog/" />
-  <updated>2026-08-27T00:00:00.000Z</updated>
+  <updated>2026-09-15T00:00:00.000Z</updated>
   <id>https://munderdiffl.in/blog/</id>
   <author><name>Chaitanya Giri</name><uri>https://munderdiffl.in</uri></author>
+  <entry>
+    <title>Aider vs Claude Code in 2026: Which Should You Use?</title>
+    <link href="https://munderdiffl.in/blog/aider-vs-claude-code/" />
+    <id>https://munderdiffl.in/blog/aider-vs-claude-code/</id>
+    <published>2026-09-15T00:00:00.000Z</published>
+    <updated>2026-09-15T00:00:00.000Z</updated><category term="Comparisons" />
+    <summary>Aider vs Claude Code, checked 15 Sep 2026: how each edits code, which models it runs, what it costs, MCP, and Aider&#39;s stalled releases.</summary>
+  </entry>
+  <entry>
+    <title>Build Your Personal AGI on Your Computer Using Claude Code and Munder Difflin</title>
+    <link href="https://munderdiffl.in/blog/build-your-personal-agi-on-your-computer/" />
+    <id>https://munderdiffl.in/blog/build-your-personal-agi-on-your-computer/</id>
+    <published>2026-09-15T00:00:00.000Z</published>
+    <updated>2026-09-15T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Turn Claude Code into a personal AGI on your own computer: agents with memory, schedules, Gmail, Calendar, voice and Slack, set up in Munder Difflin 0.5.2.</summary>
+  </entry>
+  <entry>
+    <title>How to Install Gemini CLI, and Who Can Still Use It in 2026</title>
+    <link href="https://munderdiffl.in/blog/how-to-install-gemini-cli/" />
+    <id>https://munderdiffl.in/blog/how-to-install-gemini-cli/</id>
+    <published>2026-09-15T00:00:00.000Z</published>
+    <updated>2026-09-15T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Install Google&#39;s Gemini CLI with npm on Mac, Windows or Linux, why Homebrew is stuck on 0.46.0, and which sign in still works after 18 Jun 2026.</summary>
+  </entry>
+  <entry>
+    <title>Is Ollama Good for Coding? What Local Models Can and Can&#39;t Do</title>
+    <link href="https://munderdiffl.in/blog/is-ollama-good-for-coding/" />
+    <id>https://munderdiffl.in/blog/is-ollama-good-for-coding/</id>
+    <published>2026-09-15T00:00:00.000Z</published>
+    <updated>2026-09-15T00:00:00.000Z</updated><category term="Concepts" />
+    <summary>Ollama only runs the model, so the answer depends on which one you pull and your memory. What local models do well, where Claude wins, and a verdict.</summary>
+  </entry>
+  <entry>
+    <title>How to Get the Most Out of Your Claude Code Max Plan</title>
+    <link href="https://munderdiffl.in/blog/claude-code-max-plan-tips/" />
+    <id>https://munderdiffl.in/blog/claude-code-max-plan-tips/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Stretch a Claude Code Max plan: model choice, context hygiene, prompt caching, subagents and unattended runs, checked against Anthropic&#39;s own pages.</summary>
+  </entry>
+  <entry>
+    <title>Claude Code vs Antigravity: Which One Fits Your Work?</title>
+    <link href="https://munderdiffl.in/blog/claude-code-vs-antigravity/" />
+    <id>https://munderdiffl.in/blog/claude-code-vs-antigravity/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Comparisons" />
+    <summary>Claude Code vs Google Antigravity, checked 14 Sep 2026: terminal agent or desktop agent app, Claude inside Antigravity, plans, limits and a verdict.</summary>
+  </entry>
+  <entry>
+    <title>Claude Code vs Cursor: Which Is Better in 2026?</title>
+    <link href="https://munderdiffl.in/blog/claude-code-vs-cursor/" />
+    <id>https://munderdiffl.in/blog/claude-code-vs-cursor/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Comparisons" />
+    <summary>Claude Code vs Cursor, checked 14 Sep 2026: where each runs, models, plans, the new Claude Code weekly limits, parallel agents and using both.</summary>
+  </entry>
+  <entry>
+    <title>How to Make the Most of Your Codex Max Plan</title>
+    <link href="https://munderdiffl.in/blog/codex-max-plan-tips/" />
+    <id>https://munderdiffl.in/blog/codex-max-plan-tips/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Guides" />
+    <summary>There is no Codex Max plan. What ChatGPT Pro 5x and 20x give you in Codex, how the weekly limit works, and how to stretch it.</summary>
+  </entry>
+  <entry>
+    <title>How to Connect Slack to Munder Difflin 0.5.2</title>
+    <link href="https://munderdiffl.in/blog/connect-slack-to-munder-difflin/" />
+    <id>https://munderdiffl.in/blog/connect-slack-to-munder-difflin/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Connect Slack to Munder Difflin 0.5.2: create the Slack app, add the bot scopes, pick one of three connection modes, and get answers in the thread.</summary>
+  </entry>
+  <entry>
+    <title>Grok Bot Alternatives: Six Picks, Grouped by What You Want</title>
+    <link href="https://munderdiffl.in/blog/grok-bot-alternatives/" />
+    <id>https://munderdiffl.in/blog/grok-bot-alternatives/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Comparisons" />
+    <summary>Grok Bot runs every Bot on one shared cloud computer. Six alternatives checked on 14 Sep 2026, grouped by hosting, privacy and model choice.</summary>
+  </entry>
+  <entry>
+    <title>Herdr Alternatives: What to Pick and Who Each One Fits</title>
+    <link href="https://munderdiffl.in/blog/herdr-alternatives/" />
+    <id>https://munderdiffl.in/blog/herdr-alternatives/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Comparisons" />
+    <summary>Herdr alternatives checked on 14 Sep 2026: tmux, Munder Difflin, Claude Squad, cmux, Orca, Conductor, Superset and Emdash, and who each fits.</summary>
+  </entry>
+  <entry>
+    <title>How to Connect Ollama to Claude Code</title>
+    <link href="https://munderdiffl.in/blog/how-to-connect-ollama-to-claude-code/" />
+    <id>https://munderdiffl.in/blog/how-to-connect-ollama-to-claude-code/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Point Claude Code at Ollama with ollama launch claude or three environment variables, give the model 64K of context, and know what stops working.</summary>
+  </entry>
+  <entry>
+    <title>How to Install Codex CLI on Mac, Windows and Linux</title>
+    <link href="https://munderdiffl.in/blog/how-to-install-codex-cli/" />
+    <id>https://munderdiffl.in/blog/how-to-install-codex-cli/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Install OpenAI&#39;s Codex CLI with the official script, npm or Homebrew, sign in with ChatGPT or an API key, then update it and check your version.</summary>
+  </entry>
+  <entry>
+    <title>Is It Worth Paying for Claude Code Max?</title>
+    <link href="https://munderdiffl.in/blog/is-claude-code-max-worth-it/" />
+    <id>https://munderdiffl.in/blog/is-claude-code-max-worth-it/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Concepts" />
+    <summary>Who should pay for Claude Max 5x or 20x, who should stay on Pro or an API key, and the break even math to run on your own Claude Code usage.</summary>
+  </entry>
+  <entry>
+    <title>Is Claude Code Open Source?</title>
+    <link href="https://munderdiffl.in/blog/is-claude-code-open-source/" />
+    <id>https://munderdiffl.in/blog/is-claude-code-open-source/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Concepts" />
+    <summary>No. Claude Code is proprietary under Anthropic&#39;s terms. What its GitHub repo holds, what the 2026 leak changed, and which open tools sit around it.</summary>
+  </entry>
+  <entry>
+    <title>OmniAgent Alternatives: What to Use Instead of Databricks Omnigent</title>
+    <link href="https://munderdiffl.in/blog/omniagent-alternatives/" />
+    <id>https://munderdiffl.in/blog/omniagent-alternatives/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Comparisons" />
+    <summary>OmniAgent is really Omnigent, the open source meta harness from Databricks. Alternatives checked on 14 Sep 2026, and who each one fits.</summary>
+  </entry>
+  <entry>
+    <title>What Is Vibe Coding? Meaning, Risks and Safer Habits</title>
+    <link href="https://munderdiffl.in/blog/what-is-vibe-coding/" />
+    <id>https://munderdiffl.in/blog/what-is-vibe-coding/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Concepts" />
+    <summary>Vibe coding means building software from AI prompts without reading the code. Where the term came from, when it is fine, where it bites, and what to check.</summary>
+  </entry>
+  <entry>
+    <title>Why Does Claude Code Keep Asking for Permission?</title>
+    <link href="https://munderdiffl.in/blog/why-does-claude-code-keep-asking-for-permission/" />
+    <id>https://munderdiffl.in/blog/why-does-claude-code-keep-asking-for-permission/</id>
+    <published>2026-09-14T00:00:00.000Z</published>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Claude Code asks because Manual mode gates edits, shell commands and web requests. The fixes, safest first: modes, allow rules, sandboxing, then bypass.</summary>
+  </entry>
+  <entry>
+    <title>How to Use Claude Code Plan Mode</title>
+    <link href="https://munderdiffl.in/blog/how-to-use-claude-code-plan-mode/" />
+    <id>https://munderdiffl.in/blog/how-to-use-claude-code-plan-mode/</id>
+    <published>2026-09-11T00:00:00.000Z</published>
+    <updated>2026-09-11T00:00:00.000Z</updated><category term="Guides" />
+    <summary>How Claude Code&#39;s plan mode works: turning it on, what it blocks, what a real headless plan mode run prints, and how to leave it.</summary>
+  </entry>
+  <entry>
+    <title>What Is an MCP Server?</title>
+    <link href="https://munderdiffl.in/blog/what-is-an-mcp-server/" />
+    <id>https://munderdiffl.in/blog/what-is-an-mcp-server/</id>
+    <published>2026-09-11T00:00:00.000Z</published>
+    <updated>2026-09-11T00:00:00.000Z</updated><category term="Concepts" />
+    <summary>An MCP server gives an AI agent tools, data and prompts over one open protocol. What it is, the host, client and server roles, and where Claude Code plugs in.</summary>
+  </entry>
+  <entry>
+    <title>Codex CLI vs Claude Code</title>
+    <link href="https://munderdiffl.in/blog/codex-cli-vs-claude-code/" />
+    <id>https://munderdiffl.in/blog/codex-cli-vs-claude-code/</id>
+    <published>2026-09-10T00:00:00.000Z</published>
+    <updated>2026-09-10T00:00:00.000Z</updated><category term="Comparisons" />
+    <summary>Codex CLI and Claude Code compared firsthand: sandbox and approval flags, AGENTS.md vs CLAUDE.md, real pricing, and where each terminal agent wins.</summary>
+  </entry>
+  <entry>
+    <title>How Much Does Claude Code Cost?</title>
+    <link href="https://munderdiffl.in/blog/how-much-does-claude-code-cost/" />
+    <id>https://munderdiffl.in/blog/how-much-does-claude-code-cost/</id>
+    <published>2026-09-10T00:00:00.000Z</published>
+    <updated>2026-09-10T00:00:00.000Z</updated><category term="Concepts" />
+    <summary>What Claude Code actually costs: free plan access, Claude Pro and Max pricing, per token API rates, and what running several agents does to the bill.</summary>
+  </entry>
+  <entry>
+    <title>How to Add an MCP Server to Claude Code</title>
+    <link href="https://munderdiffl.in/blog/how-to-add-an-mcp-server-to-claude-code/" />
+    <id>https://munderdiffl.in/blog/how-to-add-an-mcp-server-to-claude-code/</id>
+    <published>2026-09-10T00:00:00.000Z</published>
+    <updated>2026-09-10T00:00:00.000Z</updated><category term="Guides" />
+    <summary>The claude mcp add command, its scope flag, editing .mcp.json by hand, and how Munder Difflin&#39;s Capabilities screen grants an MCP server to one agent at a time.</summary>
+  </entry>
+  <entry>
+    <title>Munder Difflin 0.5.2: Pro, the Stapler and Everything Since 0.4.6</title>
+    <link href="https://munderdiffl.in/blog/launching-munder-difflin-v0-5-2/" />
+    <id>https://munderdiffl.in/blog/launching-munder-difflin-v0-5-2/</id>
+    <published>2026-09-10T00:00:00.000Z</published>
+    <updated>2026-09-10T00:00:00.000Z</updated><category term="Story" />
+    <summary>Munder Difflin 0.5.2 is out: how to install it, how to start Pro, what Pro adds, what changed since 0.4.6, and the end of signed Community builds.</summary>
+  </entry>
   <entry>
     <title>Launching Munder Difflin v0.4.6: It Speaks Chinese and Arabic Now</title>
     <link href="https://munderdiffl.in/blog/launching-munder-difflin-v0-4-6/" />
@@ -128,20 +320,20 @@
     <summary>The v0.3.4 + v0.3.5 wave: voice orchestration with live floor context and full app control, markdown previews everywhere, commit history and branch compare in the built-in IDE, a six-tab Settings redesign, xAI Grok and Kimi Code engines, auto-update, and a queue that always has an escape hatch.</summary>
   </entry>
   <entry>
-    <title>qm vs Munder Difflin: YC&#39;s Multiplayer Harness or a Local-First Agent Office?</title>
+    <title>qm vs Munder Difflin: YC&#39;s Multiplayer Harness or an Office of Your Clones?</title>
     <link href="https://munderdiffl.in/blog/qm-vs-munder-difflin/" />
     <id>https://munderdiffl.in/blog/qm-vs-munder-difflin/</id>
     <published>2026-08-06T00:00:00.000Z</published>
-    <updated>2026-08-06T00:00:00.000Z</updated><category term="Comparisons" />
-    <summary>An honest comparison of YC&#39;s qm and Munder Difflin: both orchestrate fleets of CLI coding agents with security postures, scheduled background work, and Slack — one as a headless multiplayer harness for teams, one as a local-first desktop office with real terminals, voice, and a built-in IDE.</summary>
+    <updated>2026-09-10T00:00:00.000Z</updated><category term="Comparisons" />
+    <summary>An honest September 2026 comparison of YC&#39;s qm and Munder Difflin. qm is a multiplayer agent harness a company deploys for Slack and the web. Munder Difflin runs an office of your clones on your own machine, with Teams to connect them.</summary>
   </entry>
   <entry>
-    <title>The Command Center: Kanban, Fleet, and Budgets in One Place</title>
+    <title>The Command Center: Kanban, Fleet and Budgets in One Place</title>
     <link href="https://munderdiffl.in/blog/command-center-guide/" />
     <id>https://munderdiffl.in/blog/command-center-guide/</id>
     <published>2026-07-03T00:00:00.000Z</published>
-    <updated>2026-07-03T00:00:00.000Z</updated><category term="Guides" />
-    <summary>A guide to Munder Difflin&#39;s Command Center — the task kanban, live fleet monitoring, per-agent budgets and cost telemetry — and when to watch the board instead of the floor.</summary>
+    <updated>2026-09-10T00:00:00.000Z</updated><category term="Guides" />
+    <summary>A guide to Munder Difflin&#39;s Command Center in 0.5.2: the kanban with task dependencies, the ask me tab, triggers, memory, live token use against each agent&#39;s budget, and when to watch the board instead of the floor.</summary>
   </entry>
   <entry>
     <title>CrewAI and AutoGen vs a Local Agent Harness: Framework or App?</title>
@@ -172,8 +364,8 @@
     <link href="https://munderdiffl.in/blog/how-to-hire-from-the-agent-gallery/" />
     <id>https://munderdiffl.in/blog/how-to-hire-from-the-agent-gallery/</id>
     <published>2026-07-03T00:00:00.000Z</published>
-    <updated>2026-07-03T00:00:00.000Z</updated><category term="Guides" />
-    <summary>A practical guide to Munder Difflin&#39;s Agent Gallery: browse six off-the-shelf hires, import one from a link or file, review the pre-filled manifest, customize identity, workspace, engine, and briefing — then spawn it yourself.</summary>
+    <updated>2026-09-10T00:00:00.000Z</updated><category term="Guides" />
+    <summary>A practical guide to Munder Difflin&#39;s Agent Gallery: pick one of 80 ready made roles, download its manifest, import it with Add agent, review every field, customise identity, workspace, engine and briefing, then spawn it yourself.</summary>
   </entry>
   <entry>
     <title>How to Brief Your Orchestrator (So the Floor Actually Ships)</title>
@@ -264,12 +456,12 @@
     <summary>Harness engineering is the discipline of building everything around the model — PTY plumbing, lifecycle hooks, mailboxes, memory, budgets, human gates, observability — because that&#39;s where agent reliability actually comes from. A definition, and four case studies from inside Munder Difflin.</summary>
   </entry>
   <entry>
-    <title>Your First Hour With Munder Difflin</title>
+    <title>Your First Hour With Munder Difflin: Onboarding to a Pro Office</title>
     <link href="https://munderdiffl.in/blog/your-first-hour-with-munder-difflin/" />
     <id>https://munderdiffl.in/blog/your-first-hour-with-munder-difflin/</id>
     <published>2026-07-03T00:00:00.000Z</published>
-    <updated>2026-08-20T00:00:00.000Z</updated><category term="Guides" />
-    <summary>A minute-by-minute walkthrough of your first hour with Munder Difflin v0.4.4: install, the clone-of-you onboarding, your first brief to Michael, watching the floor, approving your first escalation, and leaving a schedule running.</summary>
+    <updated>2026-09-14T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Munder Difflin 0.5.2 from download to a working Pro office: install Claude Code, Codex or OpenCode, sign in, go Pro, then automate reviews, Slack and email.</summary>
   </entry>
   <entry>
     <title>Launching Munder Difflin v0.3.2: Talk to Michael, a Realtime Voice Orchestrator</title>
@@ -284,207 +476,15 @@
     <link href="https://munderdiffl.in/blog/run-munder-difflin-on-a-mac-mini/" />
     <id>https://munderdiffl.in/blog/run-munder-difflin-on-a-mac-mini/</id>
     <published>2026-06-22T00:00:00.000Z</published>
-    <updated>2026-06-22T00:00:00.000Z</updated><category term="Guides" />
-    <summary>A step-by-step guide to running a whole Munder Difflin hive offline on an Apple Silicon Mac Mini — how to size models to your unified memory, install Ollama or LM Studio, and wire OpenCode and Crush to a local endpoint.</summary>
+    <updated>2026-09-10T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Run a whole Munder Difflin office offline on an Apple silicon Mac mini: size the model to your unified memory, install Ollama or LM Studio, and wire OpenCode, Crush, Qwen and Pi to it. Current as of Munder Difflin 0.5.2 and the M6 and M5 Pro Mac mini.</summary>
   </entry>
   <entry>
-    <title>Run Munder Difflin on Open-Source Models — Fully Local or via a Third-Party Provider</title>
+    <title>Run Munder Difflin on Open Source Models: Fully Local or Through a Provider</title>
     <link href="https://munderdiffl.in/blog/run-munder-difflin-on-open-models/" />
     <id>https://munderdiffl.in/blog/run-munder-difflin-on-open-models/</id>
     <published>2026-06-22T00:00:00.000Z</published>
-    <updated>2026-08-20T00:00:00.000Z</updated><category term="Guides" />
-    <summary>Munder Difflin runs your agent floor on open-weight models — gpt-oss, Qwen3, DeepSeek, Llama, Mistral, GLM, Kimi — fully local (Ollama/LM Studio/vLLM), through a third-party OSS provider, or on the model-maker&#39;s own CLI. Here&#39;s the wiring, current as of v0.4.4.</summary>
-  </entry>
-  <entry>
-    <title>Launching Munder Difflin v0.3.0: Selectable Engines, Integrations &amp; Slack-Spawned Workers</title>
-    <link href="https://munderdiffl.in/blog/launching-munder-difflin-v0-3-0/" />
-    <id>https://munderdiffl.in/blog/launching-munder-difflin-v0-3-0/</id>
-    <published>2026-06-21T00:00:00.000Z</published>
-    <updated>2026-06-21T00:00:00.000Z</updated><category term="Story" />
-    <summary>Munder Difflin v0.3.0 makes every hire — and Michael himself — a pluggable engine, adds an integrations registry with a write-only secret broker, and lets the god orchestrator spawn an ephemeral worker straight from Slack.</summary>
-  </entry>
-  <entry>
-    <title>Treating a Hire Manifest as Untrusted Input</title>
-    <link href="https://munderdiffl.in/blog/hire-manifest-untrusted-input/" />
-    <id>https://munderdiffl.in/blog/hire-manifest-untrusted-input/</id>
-    <published>2026-06-15T00:00:00.000Z</published>
-    <updated>2026-06-15T00:00:00.000Z</updated><category term="Internals" />
-    <summary>A shareable agent-config manifest is attacker input. How Munder Difflin&#39;s import pipeline stays inert: no auto-spawn, default-deny flags, and an SSRF-safe bounded fetch.</summary>
-  </entry>
-  <entry>
-    <title>Launching Munder Difflin v0.2.8: Shareable Hires</title>
-    <link href="https://munderdiffl.in/blog/launching-munder-difflin-v0-2-8/" />
-    <id>https://munderdiffl.in/blog/launching-munder-difflin-v0-2-8/</id>
-    <published>2026-06-15T00:00:00.000Z</published>
-    <updated>2026-06-15T00:00:00.000Z</updated><category term="Story" />
-    <summary>Munder Difflin v0.2.8 ships Shareable Hires: a one-click, portable agent role manifest + The Hiring Fair gallery. Click a hire link, review every field, then spawn it yourself.</summary>
-  </entry>
-  <entry>
-    <title>Shareable Agent Roles: A Portable Format for Hiring AI Coworkers</title>
-    <link href="https://munderdiffl.in/blog/shareable-agent-roles/" />
-    <id>https://munderdiffl.in/blog/shareable-agent-roles/</id>
-    <published>2026-06-15T00:00:00.000Z</published>
-    <updated>2026-06-15T00:00:00.000Z</updated><category term="Concepts" />
-    <summary>Why agent roles should be portable: what a hire manifest encodes, how one-click hiring stays safe, and how The Hiring Fair turns tacit setup into a shareable artifact.</summary>
-  </entry>
-  <entry>
-    <title>Deploy a Blog-Writer Agent: The One That Wrote This Post</title>
-    <link href="https://munderdiffl.in/blog/deploy-a-blog-writer-agent/" />
-    <id>https://munderdiffl.in/blog/deploy-a-blog-writer-agent/</id>
-    <published>2026-06-10T00:00:00.000Z</published>
-    <updated>2026-08-20T00:00:00.000Z</updated><category term="Use Cases" />
-    <summary>How Munder Difflin&#39;s blog is written by an automated writer agent in the hive — drafts in a worktree, single-committer integration, Eleventy build, human-gated deploy, and now hand-drawn illustrations from the same office. Build your own.</summary>
-  </entry>
-  <entry>
-    <title>Deploy a PR Reviewer That Never Sleeps — In About One Prompt</title>
-    <link href="https://munderdiffl.in/blog/deploy-automated-pr-reviewer-agent/" />
-    <id>https://munderdiffl.in/blog/deploy-automated-pr-reviewer-agent/</id>
-    <published>2026-06-10T00:00:00.000Z</published>
-    <updated>2026-08-20T00:00:00.000Z</updated><category term="Orchestration" />
-    <summary>A how-to for standing up a fully automated PR-reviewing agent in Munder Difflin — one that reads your real source (not just the PR description), de-dupes noise, and only escalates what matters. With a real triage run that turned 22 duplicate firings into a clean v0.2.5 patch queue.</summary>
-  </entry>
-  <entry>
-    <title>Run Your AI Agent Hive from Slack: The Complete Setup</title>
-    <link href="https://munderdiffl.in/blog/run-ai-agent-hive-from-slack-setup/" />
-    <id>https://munderdiffl.in/blog/run-ai-agent-hive-from-slack-setup/</id>
-    <published>2026-06-10T00:00:00.000Z</published>
-    <updated>2026-06-10T00:00:00.000Z</updated><category term="Guides" />
-    <summary>Step-by-step setup for driving Munder Difflin&#39;s AI agent hive from Slack: create the app, set scopes, paste the tunnel Request URL, and @mention your bot to start work — done-summaries post back in-thread.</summary>
-  </entry>
-  <entry>
-    <title>The Clone Army Is a Trap: Why a Mixed Swarm Beats Ten Identical Agents</title>
-    <link href="https://munderdiffl.in/blog/the-clone-army-trap-mixed-swarm-vs-identical-agents/" />
-    <id>https://munderdiffl.in/blog/the-clone-army-trap-mixed-swarm-vs-identical-agents/</id>
-    <published>2026-06-10T00:00:00.000Z</published>
-    <updated>2026-06-10T00:00:00.000Z</updated><category term="Concepts" />
-    <summary>Spinning up tens of identical top-tier CLI agents feels powerful and burns tokens on work a cheaper agent could do. A mixed-capability swarm with shared memory wins on cost — and often on quality.</summary>
-  </entry>
-  <entry>
-    <title>How to Trigger Your AI Agent Hive from a GitHub Webhook</title>
-    <link href="https://munderdiffl.in/blog/trigger-ai-agents-from-github-webhook/" />
-    <id>https://munderdiffl.in/blog/trigger-ai-agents-from-github-webhook/</id>
-    <published>2026-06-10T00:00:00.000Z</published>
-    <updated>2026-06-10T00:00:00.000Z</updated><category term="Guides" />
-    <summary>Wire a GitHub webhook to Munder Difflin: a secret-gated local endpoint turns each repo event into a task for your GOD orchestrator — POST a message, get a token, poll the result. No server to host.</summary>
-  </entry>
-  <entry>
-    <title>Why CLI Agents Are So Powerful — and How Munder Difflin Spends Fewer Tokens Doing the Same Work</title>
-    <link href="https://munderdiffl.in/blog/why-cli-agents-are-powerful/" />
-    <id>https://munderdiffl.in/blog/why-cli-agents-are-powerful/</id>
-    <published>2026-06-10T00:00:00.000Z</published>
-    <updated>2026-06-10T00:00:00.000Z</updated><category term="Concepts" />
-    <summary>CLI agents are powerful because they have terminal-level access: they run builds, tests, and git, and verify their own work by executing it. Here&#39;s why that matters — and the concrete ways Munder Difflin cuts token consumption while doing it.</summary>
-  </entry>
-  <entry>
-    <title>Launching Munder Difflin v0.2.4</title>
-    <link href="https://munderdiffl.in/blog/launching-munder-difflin-v0-2-4/" />
-    <id>https://munderdiffl.in/blog/launching-munder-difflin-v0-2-4/</id>
-    <published>2026-06-09T00:00:00.000Z</published>
-    <updated>2026-06-09T00:00:00.000Z</updated><category term="Story" />
-    <summary>Munder Difflin v0.2.4 is here: Claude Code, OpenAI Codex, and Antigravity (Gemini) agents now run as one hive with full parity — no API keys, no setup. Brief a GOD orchestrator, automate basically anything in one prompt, and close the lid while it keeps working.</summary>
-  </entry>
-  <entry>
-    <title>Munder Difflin v0.2.4 Feature Walkthrough</title>
-    <link href="https://munderdiffl.in/blog/munder-difflin-v0-2-4-feature-walkthrough/" />
-    <id>https://munderdiffl.in/blog/munder-difflin-v0-2-4-feature-walkthrough/</id>
-    <published>2026-06-09T00:00:00.000Z</published>
-    <updated>2026-06-09T00:00:00.000Z</updated><category term="Guides" />
-    <summary>A comprehensive guide to every change in Munder Difflin v0.2.4 — how the Codex lifecycle-hook bridge achieves full hive parity, what the Schedules tab adds, why tunnelmole replaced localtunnel, and what else shipped.</summary>
-  </entry>
-  <entry>
-    <title>Launching Munder Difflin v0.2.0</title>
-    <link href="https://munderdiffl.in/blog/launching-munder-difflin-v0-2-0/" />
-    <id>https://munderdiffl.in/blog/launching-munder-difflin-v0-2-0/</id>
-    <published>2026-06-07T00:00:00.000Z</published>
-    <updated>2026-06-07T00:00:00.000Z</updated><category term="Story" />
-    <summary>Munder Difflin v0.2.0 is here: a Command Center overhaul, per-agent token budgets, live OpenTelemetry observability, a circuit breaker, durable SQLite persistence, and a big round of community fixes.</summary>
-  </entry>
-  <entry>
-    <title>One Prompt, Five PR Reviews, and an Hourly Automation — A Dogfooding Story</title>
-    <link href="https://munderdiffl.in/blog/one-prompt-automated-pr-review/" />
-    <id>https://munderdiffl.in/blog/one-prompt-automated-pr-review/</id>
-    <published>2026-06-07T00:00:00.000Z</published>
-    <updated>2026-06-07T00:00:00.000Z</updated><category term="Story" />
-    <summary>How a single prompt to the Munder Difflin god agent reviewed all open PRs and set up a recurring hourly PR reviewer — while the repo was blowing up with 400+ stars.</summary>
-  </entry>
-  <entry>
-    <title>Does the June 2026 Agent SDK Change Affect Munder Difflin?</title>
-    <link href="https://munderdiffl.in/blog/does-the-june-2026-agent-sdk-change-affect-munder-difflin/" />
-    <id>https://munderdiffl.in/blog/does-the-june-2026-agent-sdk-change-affect-munder-difflin/</id>
-    <published>2026-06-06T00:00:00.000Z</published>
-    <updated>2026-06-06T00:00:00.000Z</updated><category term="Guides" />
-    <summary>From June 15, 2026 the Claude Agent SDK gets a separate credit. Munder Difflin drives the native Claude Code CLI, so your hive runs on your plan as before.</summary>
-  </entry>
-  <entry>
-    <title>The Best AI Coding Agents in 2026: A Field Guide</title>
-    <link href="https://munderdiffl.in/blog/best-ai-coding-agents/" />
-    <id>https://munderdiffl.in/blog/best-ai-coding-agents/</id>
-    <published>2026-06-05T00:00:00.000Z</published>
-    <updated>2026-06-05T00:00:00.000Z</updated><category term="Comparisons" />
-    <summary>A fair 2026 field guide to the best AI coding agents — Cursor, Aider, Cline, Devin, Copilot — by category, plus where a local multi-agent hive fits.</summary>
-  </entry>
-  <entry>
-    <title>Cline vs Munder Difflin: In-Editor Agent or Local Hive?</title>
-    <link href="https://munderdiffl.in/blog/cline-vs-munder-difflin/" />
-    <id>https://munderdiffl.in/blog/cline-vs-munder-difflin/</id>
-    <published>2026-06-05T00:00:00.000Z</published>
-    <updated>2026-06-05T00:00:00.000Z</updated><category term="Comparisons" />
-    <summary>A fair comparison of Cline and Munder Difflin — an in-editor BYOK coding agent vs a local multi-agent orchestration hive — and when to pick which.</summary>
-  </entry>
-  <entry>
-    <title>Compressing Agent Memory Without Losing the Original</title>
-    <link href="https://munderdiffl.in/blog/compressing-agent-memory/" />
-    <id>https://munderdiffl.in/blog/compressing-agent-memory/</id>
-    <published>2026-06-05T00:00:00.000Z</published>
-    <updated>2026-06-05T00:00:00.000Z</updated><category term="Internals" />
-    <summary>How and why to compress an agent&#39;s long-term memory: the toolbox, the lossy trap, and keeping a lossless original beside a compact copy.</summary>
-  </entry>
-  <entry>
-    <title>Generative Engine Optimization: The Techniques the Research Backs</title>
-    <link href="https://munderdiffl.in/blog/generative-engine-optimization-techniques/" />
-    <id>https://munderdiffl.in/blog/generative-engine-optimization-techniques/</id>
-    <published>2026-06-05T00:00:00.000Z</published>
-    <updated>2026-06-05T00:00:00.000Z</updated><category term="Concepts" />
-    <summary>What the first peer-reviewed GEO study found works to get content cited by AI — statistics, source citations, quotes — and why keyword stuffing backfires.</summary>
-  </entry>
-  <entry>
-    <title>How to Install and Use Munder Difflin: A Beginner&#39;s Guide</title>
-    <link href="https://munderdiffl.in/blog/how-to-install-and-use-munder-difflin/" />
-    <id>https://munderdiffl.in/blog/how-to-install-and-use-munder-difflin/</id>
-    <published>2026-06-05T00:00:00.000Z</published>
-    <updated>2026-08-27T00:00:00.000Z</updated><category term="Guides" />
-    <summary>A plain-language guide to Munder Difflin v0.4.6. What a coding agent is, which AI engine to pick based on what you already pay for, the one terminal command you&#39;ll ever run, and how to install and set it up on macOS, Windows or Linux.</summary>
-  </entry>
-  <entry>
-    <title>MCP Tool Poisoning: How to Secure the Model Context Protocol</title>
-    <link href="https://munderdiffl.in/blog/mcp-security-tool-poisoning/" />
-    <id>https://munderdiffl.in/blog/mcp-security-tool-poisoning/</id>
-    <published>2026-06-05T00:00:00.000Z</published>
-    <updated>2026-06-05T00:00:00.000Z</updated><category term="Guides" />
-    <summary>How the Model Context Protocol gets attacked — tool poisoning, rug pulls, command injection — and the layered defenses that secure your MCP tools.</summary>
-  </entry>
-  <entry>
-    <title>Multi-Agent Orchestration Patterns: Which Topology, and When</title>
-    <link href="https://munderdiffl.in/blog/multi-agent-orchestration-patterns/" />
-    <id>https://munderdiffl.in/blog/multi-agent-orchestration-patterns/</id>
-    <published>2026-06-05T00:00:00.000Z</published>
-    <updated>2026-06-05T00:00:00.000Z</updated><category term="Orchestration" />
-    <summary>The multi-agent orchestration patterns — orchestrator-worker, pipeline, fan-out, debate, swarm, blackboard — when to use each, and when one agent wins.</summary>
-  </entry>
-  <entry>
-    <title>The Multi-Agent Cost Playbook: Five Levers to Cut AI Agent Spend</title>
-    <link href="https://munderdiffl.in/blog/the-multi-agent-cost-playbook/" />
-    <id>https://munderdiffl.in/blog/the-multi-agent-cost-playbook/</id>
-    <published>2026-06-05T00:00:00.000Z</published>
-    <updated>2026-06-05T00:00:00.000Z</updated><category term="Guides" />
-    <summary>Caching, batching, model tiering, context discipline, local-first — the five levers that cut a multi-agent fleet&#39;s bill, and how they compound.</summary>
-  </entry>
-  <entry>
-    <title>Running AI Agents Safely: Permission Modes and Sandboxing</title>
-    <link href="https://munderdiffl.in/blog/agent-security-and-sandboxing/" />
-    <id>https://munderdiffl.in/blog/agent-security-and-sandboxing/</id>
-    <published>2026-06-04T00:00:00.000Z</published>
-    <updated>2026-06-04T00:00:00.000Z</updated><category term="Guides" />
-    <summary>How to run autonomous AI agents safely: permission modes and the bypassPermissions foot-gun, workspace isolation, and what to gate vs. allow.</summary>
+    <updated>2026-09-10T00:00:00.000Z</updated><category term="Guides" />
+    <summary>Munder Difflin can run your whole agent floor on open weight models like gpt-oss, Qwen3, DeepSeek, Llama, GLM and Kimi: fully local with Ollama, LM Studio or vLLM, or through a provider with your own key. The wiring for each engine, current as of 0.5.2.</summary>
   </entry>
 </feed>

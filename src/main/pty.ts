@@ -30,6 +30,15 @@ export function withHiveRuntimeFallback(path: string, hiveRoot?: string): string
   return [...entries, dir].join(delimiter);
 }
 
+/** What the exit handler is told about a process that just died. Passed by
+ *  value because the session is deleted from the map before the handler runs. */
+export interface PtyExitInfo {
+  signal?: number;
+  tail?: string;
+  command?: string;
+  cwd?: string;
+}
+
 interface PtySession {
   id: string;
   proc: pty.IPty;
@@ -47,15 +56,20 @@ interface PtySession {
    *  file) and the idle handshake that gates god's PTY nudge (never type into a
    *  PTY that produced output in the last few seconds = mid-stream). */
   lastOutputAt: number;
+  /** A bounded ring of the most recent output bytes, kept ONLY so an abnormal
+   *  exit can say what was on screen when the process died. A provider that
+   *  crashes on startup (Bun SIGILL, a missing shared library, an auth failure)
+   *  prints its explanation and vanishes; without this the explanation exists
+   *  nowhere but a terminal pane the operator may never have been looking at.
+   *  Capped at AGENT_LOG_CAP and ANSI-stripped (see onData) so the flushed
+   *  per-agent log reads as plain text and cannot grow without bound. */
+  tail: string;
   /** True after the child has emitted at least one frame. Automation waits for
    *  this before typing, so startup prompts cannot outrun the TUI subscription. */
   hasOutput: boolean;
   /** Sandbox container behind this PTY's docker client, if any (see
    *  SpawnOptions.containerName) — kill paths must reap it alongside the client. */
   containerName?: string;
-  /** Rolling tail of recent output (ANSI-stripped, capped), flushed to a per-agent
-   *  log file on exit so a crash message survives the --rm container. */
-  tail?: string;
 }
 
 /** Strip ANSI/OSC escapes + CRs so the flushed log reads as plain text. */
@@ -335,7 +349,8 @@ export class PtyManager {
    *  externally), so the main process can run the SAME lifecycle teardown
    *  (archive, worktree removal, map cleanup) that the explicit kill() path
    *  runs. Best-effort — set once by the main process. */
-  private exitHandler: ((id: string, exitCode?: number) => void) | null = null;
+  private exitHandler:
+    ((id: string, exitCode?: number, info?: PtyExitInfo) => void) | null = null;
 
   /** The default/fallback output sink — set to the PRIMARY window. Used only for
    *  sessions with no recorded owner; owned sessions route to their owner. */
@@ -373,7 +388,9 @@ export class PtyManager {
    *  onExit after the session is cleaned up. The exit code is forwarded so the
    *  handler can distinguish a clean exit (e.g. a successful first-time CLI
    *  install → auto restart-and-continue) from a crash. */
-  setExitHandler(handler: (id: string, exitCode?: number) => void): void {
+  setExitHandler(
+    handler: (id: string, exitCode?: number, info?: PtyExitInfo) => void
+  ): void {
     this.exitHandler = handler;
   }
 
@@ -695,6 +712,7 @@ export class PtyManager {
         command: resolved,
         lastOutputAt: Date.now(),
         hasOutput: false,
+        tail: '',
         owner,
         containerName: opts.containerName
       };
@@ -707,6 +725,8 @@ export class PtyManager {
         session.hasOutput = true;
         session.lastOutputAt = Date.now();
         // Keep a capped, plain-text tail for the exit log (crash-message capture).
+        // Slice AFTER appending so a single oversized write still leaves us its end
+        // (the part that explains a death); ANSI-stripped so the log reads clean.
         session.tail = ((session.tail ?? '') + String(data).replace(ANSI_RE, '')).slice(-AGENT_LOG_CAP);
         // Route to the session's owner window (multi-window owner routing).
         this.safeSend(`pty:data:${opts.id}`, data, session.owner);
@@ -728,7 +748,21 @@ export class PtyManager {
         this.sessions.delete(opts.id);
         // Natural exit must run the same lifecycle teardown as an explicit kill.
         // Guarded so a teardown error can never crash node-pty's exit callback.
-        try { this.exitHandler?.(opts.id, exitCode); } catch { /* never throw out of onExit */ }
+        // `signal` is forwarded, not dropped: a provider killed by SIGILL/SIGSEGV
+        // exits with code 0 and a non-zero signal, so an exitCode-only handler
+        // cannot tell a crash from a clean finish. `tail` carries whatever the
+        // process printed on its way out.
+        // The session is already out of `sessions` by now, so anything the
+        // handler needs about the dead process must be handed to it here —
+        // it cannot look the session up any more.
+        try {
+          this.exitHandler?.(opts.id, exitCode, {
+            signal,
+            tail: session.tail,
+            command: session.command,
+            cwd: session.cwd
+          });
+        } catch { /* never throw out of onExit */ }
       });
 
       return { ok: true };

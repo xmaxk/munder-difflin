@@ -1,6 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js), Google Ads AW-18388216863. Loaded only when Do Not Track is
+     off, so it follows the same rule as the PostHog block on this site. -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  if (navigator.doNotTrack !== '1') {
+    var gtagScript = document.createElement('script');
+    gtagScript.async = true;
+    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18388216863';
+    document.head.appendChild(gtagScript);
+    gtag('js', new Date());
+    gtag('config', 'AW-18388216863');
+  }
+</script>
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Building a Terminal UI with xterm.js and node-pty — Munder Difflin Blog</title>
@@ -17,7 +32,10 @@
 <meta property="og:title" content="Building a Terminal UI with xterm.js and node-pty — Munder Difflin Blog" />
 <meta property="og:description" content="Wire xterm.js to a node-pty backend: stream output, write keystrokes back, handle resize, and keep many live terminals fast with a terminal pool." />
 <meta property="og:url" content="https://munderdiffl.in/blog/building-a-terminal-ui-xterm-node-pty/" />
-<meta property="og:image" content="https://munderdiffl.in/media/og.png" />
+<meta property="og:image" content="https://munderdiffl.in/blog/assets/media/building-a-terminal-ui-xterm-node-pty/hero.png" />
+<meta property="og:image:width" content="1600" />
+<meta property="og:image:height" content="900" />
+<meta property="og:image:alt" content="Illustration: Building a Terminal UI with xterm.js and node-pty" />
 <meta property="og:locale" content="en_US" />
 <meta property="article:published_time" content="2026-06-03T00:00:00.000Z" />
 <meta property="article:author" content="Chaitanya Giri" />
@@ -31,7 +49,8 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Building a Terminal UI with xterm.js and node-pty — Munder Difflin Blog" />
 <meta name="twitter:description" content="Wire xterm.js to a node-pty backend: stream output, write keystrokes back, handle resize, and keep many live terminals fast with a terminal pool." />
-<meta name="twitter:image" content="https://munderdiffl.in/media/og.png" />
+<meta name="twitter:image" content="https://munderdiffl.in/blog/assets/media/building-a-terminal-ui-xterm-node-pty/hero.png" />
+<meta name="twitter:image:alt" content="Illustration: Building a Terminal UI with xterm.js and node-pty" />
 
 <link rel="alternate" type="application/atom+xml" title="Munder Difflin Blog" href="https://munderdiffl.in/blog/feed.xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,7 +64,7 @@
   "@type": "BlogPosting",
   "headline": "Building a Terminal UI with xterm.js and node-pty",
   "description": "Wire xterm.js to a node-pty backend: stream output, write keystrokes back, handle resize, and keep many live terminals fast with a terminal pool.",
-  "image": ["https://munderdiffl.in/media/og.png"],
+  "image": ["https://munderdiffl.in/blog/assets/media/building-a-terminal-ui-xterm-node-pty/hero.png"],
   "datePublished": "2026-06-03T00:00:00.000Z",
   "dateModified": "2026-06-03T00:00:00.000Z",
   "author": { "@type": "Person", "name": "Chaitanya Giri" },
