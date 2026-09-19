@@ -16,12 +16,14 @@ import { dirname } from 'node:path';
 import { getText } from './fetchText';
 import { parseModelCatalog, type ModelCatalog } from '../shared/modelCatalogPayload';
 
-// Fork: point at THIS fork's catalog, not upstream's, so an upstream remote
-// catalog can never overwrite our baked provider lists (notably the local/
-// Lemonade rows on `opencode`). Absent the file the fetch 404s and the baked
-// copy is kept — a safe default either way.
+// Fork: point at the branch we actually build (feat/gvisor-sandbox), NOT `main`.
+// The fork's `main` tracks upstream and lacks our catalog additions (the local/
+// Lemonade rows on `opencode`); pointing there let upstream's remote list
+// silently replace our baked `opencode` block. This branch's docs/model-catalog.json
+// is kept in sync with the baked copy (enforced by test/model-catalog.test.cjs),
+// so remote == baked and the merge is a no-op that can never drop our rows.
 const CATALOG_URL =
-  'https://raw.githubusercontent.com/xmaxk/munder-difflin/main/docs/model-catalog.json';
+  'https://raw.githubusercontent.com/xmaxk/munder-difflin/feat/gvisor-sandbox/docs/model-catalog.json';
 
 /** Models ship on a human timescale, and a stale list costs the user nothing —
  *  every command field in the app stays editable. Six hours matches the hero
