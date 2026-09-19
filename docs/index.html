@@ -293,10 +293,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:rgba(2
 .tier li::before{content:"✓";color:var(--green);font-weight:700;margin-right:8px}
 .tier .btn{margin-top:auto;justify-content:center}
 .tier .btn+.btn{margin-top:0}
-.seats{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
-.seats input[type=range]{flex:1;accent-color:var(--ink)}
-.seats output{font-weight:700;color:var(--ink);min-width:6ch;text-align:right}
-.tier .total{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
 .terms{max-width:820px;margin:20px auto 0;font-size:.92rem;color:var(--muted)}
 .wall-cta{max-width:820px;margin:18px auto 0;text-align:center}
 /* faq */
@@ -338,7 +334,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
       <a class="txt" href="https://harnessmd.com/signin">Sign in</a>
       <!-- Star count: GitHub API on 2026-09-09 said 6,686. Every .starct on the page is written correct and then refreshed live; see updateStars(). -->
       <a class="btn sm" href="https://github.com/chaitanyagiri/munder-difflin" target="_blank" rel="noopener">★ <span class="starct">6.7K</span></a>
-      <a class="btn primary sm" href="./download.html">Download</a>
+      <a class="btn primary sm" href="https://harnessmd.com/download">Download</a>
     </div>
     <button type="button" class="nav-burger" id="navBurger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
@@ -371,9 +367,9 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
     <h1>Agent harness to run an office of your clones</h1>
     <p class="lead"><strong>Free, open source and performant</strong> multi-agent harness, works with your existing subscriptions (uses hourly limits).</p>
     <div class="btn-row">
-      <a class="btn primary lg" href="./download.html">⤓ Download free</a>
+      <a class="btn primary lg" href="https://harnessmd.com/download">⤓ Download free</a>
     </div>
-    <p class="teams-link"><a href="https://harnessmd.com/console">Munder Difflin for Teams</a></p>
+    <p class="teams-link"><a href="https://cal.com/chaitanya-giri-dk45ov/30min" target="_blank" rel="noopener">Talk to us about Teams</a></p>
     <div class="media2">
       <figure class="shotbox">
         <div class="frame">
@@ -392,7 +388,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
         <figcaption><b>PRO.</b> The same office in a sidebar, one screen at a time, with Stapler floating over everything you do.</figcaption>
       </figure>
     </div>
-    <p class="meta">macOS, Windows and Linux. Same download for everyone. Paid plans start with a 14 day trial.</p>
+    <p class="meta">macOS, Windows and Linux. Same download for everyone. Pro starts with a 14 day trial.</p>
   </div>
 </header>
 
@@ -567,7 +563,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
         </div>
         <h3>Orchestrators that talk to each other.</h3>
         <p>Everything in Pro for every seat. Each person's orchestrator on their own machine, under their own keys, every message sealed for the device that opens it.</p>
-        <a class="more" href="https://cal.com/chaitanya-giri-w3wrwi/munder-difflin-teams-demo" target="_blank" rel="noopener">Book a demo →</a>
+        <a class="more" href="https://cal.com/chaitanya-giri-dk45ov/30min" target="_blank" rel="noopener">Talk to us about Teams →</a>
       </div>
 
       <div class="card feat">
@@ -636,7 +632,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
   </div>
 </section>
 
-<!-- 8. PRICING. Source of truth: web/harnessmd/src/server/pricing.ts. The page says nothing about a card for the Pro trial: the /pro dashboard trial (startProTrial) asks for nothing and grants no licence key, the licence trial that gives a working Pro asks for a card, and the founder has not ruled which survives. Teams trial starts at the card, first charge 14 days out (handlers.ts).
+<!-- 8. PRICING. Source of truth: web/harnessmd/src/server/pricing.ts. The page says nothing about a card for the Pro trial: the /pro dashboard trial (startProTrial) asks for nothing and grants no licence key, the licence trial that gives a working Pro asks for a card, and the founder has not ruled which survives.
      Sandbox is not shipped and not sold; no price printed.
 
      PRO LEADS WITH THE YEAR, 10 Sep 2026. The founder REVERSED his older standing rule (show monthly, starting-from, never lead with an annual
@@ -646,8 +642,14 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
      without rounding in our own favour.
      THE SAVING IS NOT PRINTED AS A PERCENTAGE HERE. Both figures are shown and the strikethrough does the arithmetic, which is exactly true and
      needs no rounding. That is also what pricing.ts asks for.
-     TEAMS STILL LEADS WITH THE MONTH, on purpose, not by oversight: the reversal was given to me for Pro and the Teams figures were named as out
-     of scope. If the year is meant to lead there too, that is one more edit and it needs saying. -->
+     TEAMS CARRIES NO FIGURE AT ALL, 16 Sep 2026. Teams is no longer sold from this page. It is set up with us on a call, so the per seat month
+     price, the per seat year price, the size slider with its running total, the trial chip and the card sentence all came out of this section
+     together. Nothing replaced them with a smaller number or a range, and no number belongs here: the tier says the plan is arranged on a call
+     and the call is where it is priced. All four Teams calls to action on this page, the hero link, the Teams feature card, this tier button
+     and the closing button, point at the same booking calendar, https://cal.com/chaitanya-giri-dk45ov/30min, and there is no other booking
+     link left on the site. THE CALENDAR IS THE DESTINATION ON PURPOSE AND FOR NOW: the intent form at /teams/talk, which would also catch
+     someone who reads the page and does not book, is not built yet. When it ships these four links move to it in one edit, and this comment
+     should say so. Pro is untouched by any of this. If a Teams figure is ever meant to print here again it needs saying. -->
 <section id="pricing">
   <div class="wrap center">
     <h2>One download. Three plans.</h2>
@@ -661,7 +663,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
           <li>Unlimited local agents, twelve providers</li>
           <li>MIT licensed</li>
         </ul>
-        <a class="btn" href="./download.html">Download free</a>
+        <a class="btn" href="https://harnessmd.com/download">Download free</a>
       </div>
       <div class="tier hot">
         <div class="th"><span class="tn">PRO</span><span class="chip on">14 day trial</span></div>
@@ -675,20 +677,18 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
         <a class="btn primary" href="https://harnessmd.com/pro">Get Pro</a>
       </div>
       <div class="tier">
-        <div class="th"><span class="tn">TEAMS</span><span class="chip">14 day trial</span></div>
-        <div class="price">$39<small>/seat/month</small></div>
-        <div class="price-alt">or $399 a seat a year. 2 to 20 seats</div>
+        <div class="th"><span class="tn">TEAMS</span></div>
+        <div class="price">By call</div>
+        <div class="price-alt">thirty minutes, set up with us</div>
         <ul>
           <li>Clones that talk, sealed per device</li>
-          <li>Seats, names, direct messages, files</li>
-          <li>Plan, seats, card and invoices in one console</li>
+          <li>Seats by invite code, names, direct messages, files</li>
+          <li>The admin console: members, activity, settings</li>
         </ul>
-        <div class="seats"><label for="seats">SEATS</label><input type="range" id="seats" min="2" max="20" step="1" value="5" aria-label="Team size in seats"><output id="seatsOut" for="seats">5</output></div>
-        <div class="total" id="teamTotal">$195 a month for 5 seats</div>
-        <a class="btn primary" href="https://harnessmd.com/console">Start a team</a>
+        <a class="btn primary" href="https://cal.com/chaitanya-giri-dk45ov/30min" target="_blank" rel="noopener">Talk to us about Teams</a>
       </div>
     </div>
-    <p class="terms">Teams takes a card at checkout and charges nothing until day 14. Sandboxes, so a clone keeps working with the lid closed, are coming and are not for sale yet.</p>
+    <p class="terms">Teams is set up with us, one team at a time. Book a thirty minute call, tell us the shape of your team on it, and we size it and price it with you there. Sandboxes, so a clone keeps working with the lid closed, are coming and are not for sale yet.</p>
     <!-- The Founding Supporter band was a heading, the $20 offer and two buttons.
          The founder collapsed it to ONE button through to the wall (9 Sep 2026),
          and the buy path is gone entirely: the wall is our thank you page and a
@@ -712,8 +712,8 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
       <details><summary>Is Stapler free?</summary><p>No. It is Pro only, and it is off until you switch it on in the Pro sidebar. The first screenshot makes macOS ask for screen recording permission.</p></details>
       <details><summary>Do teams need a different build?</summary><p>No. Same download, same binary. The Teams plan unlocks the network.</p></details>
       <details><summary>Does my laptop need to stay on?</summary><p>Yes. The clone runs on your machine and stops when the machine does. Sandboxes on machines we host, so a job keeps running after the lid closes, are coming.</p></details>
-      <details><summary>Will Teams charge me during the trial?</summary><p>No. Teams takes a card at checkout and the first charge lands on day 14, not before.</p></details>
-      <details><summary>What does it cost?</summary><p>Free is free. Pro is $150 a year while the launch offer runs, down from $200, or $20 a month. Teams is $39 a seat a month or $399 a seat a year, for 2 to 20 seats. More than 20 seats is a conversation.</p></details>
+      <details><summary>How do I get Teams?</summary><p>On a call. Teams is set up with us, one team at a time. Book a thirty minute slot, and on the call we size the team with you, make the organisation and hand you the invite codes.</p></details>
+      <details><summary>What does it cost?</summary><p>Free is free. Pro is $150 a year while the launch offer runs, down from $200, or $20 a month. Teams is priced with you, per team, once we know your people and whether you need sandboxes. That happens on the call.</p></details>
     </div>
   </div>
 </section>
@@ -725,9 +725,9 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
       <h2>Clock in your clone.</h2>
       <p>You do the work only you can do. Your clone does the rest.</p>
       <div class="btn-row" style="justify-content:center">
-        <a class="btn primary lg" href="./download.html">Download free</a>
+        <a class="btn primary lg" href="https://harnessmd.com/download">Download free</a>
         <a class="btn lg" href="https://harnessmd.com/pro">Get Pro</a>
-        <a class="btn lg" href="https://harnessmd.com/console">Start a team</a>
+        <a class="btn lg" href="https://cal.com/chaitanya-giri-dk45ov/30min" target="_blank" rel="noopener">Talk to us about Teams</a>
       </div>
     </div>
   </div>
@@ -744,7 +744,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px}
         <a href="#pricing">Pricing</a>
         <a href="https://munderdiffl.in/wall.html" target="_blank" rel="noopener">Founders' Wall</a>
         <a href="mailto:girichaitanya11@gmail.com">Contact</a>
-        <a href="./download.html">Download</a>
+        <a href="https://harnessmd.com/download">Download</a>
         <a href="https://github.com/chaitanyagiri/munder-difflin/blob/main/SECURITY.md" target="_blank" rel="noopener">Security</a>
         <a href="https://github.com/chaitanyagiri/munder-difflin/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
         <a href="https://munderdiffl.in/terms.html" target="_blank" rel="noopener">Terms</a>
@@ -969,9 +969,17 @@ function O({l:t,c:e,h:s}){let n=s*Math.PI/180,r=e*Math.cos(n),o=e*Math.sin(n),c=
   var slots = document.querySelectorAll('.slot');
   for (var s = 0; s < slots.length; s++) { var im = slots[s].querySelector('img'); if (im) settle(slots[s], im); }
 
-  /* ---- downloads: every Download button links to ./download.html, the site's
-     own download page. The direct OS file links, REL and the sizes live there,
-     and only there; this page carries none of them any more. ---- */
+  /* ---- downloads: every Download button now links straight to
+     harnessmd.com/download, which reads the version and the file sizes off disk.
+     munderdiffl.in/download.html was a second, hand maintained copy of the same
+     page and was retired on 17 Sep 2026; it is a redirect now. This page still
+     carries no direct OS file links. ---- */
+
+  /* ---- No Google Ads conversion fires on this page. It is reported on
+     harnessmd.com/download, at the click on an actual installer, which is the
+     only place that sees the thing we want to count. Firing it here as well, on
+     the way out, would report the same conversion action twice for one visit and
+     would credit anyone who left for the download page and never downloaded. ---- */
 
   /* ---- mobile nav: the burger turns into a cross and opens the link drawer ---- */
   (function () {
@@ -983,10 +991,8 @@ function O({l:t,c:e,h:s}){let n=s*Math.PI/180,r=e*Math.cos(n),o=e*Math.sin(n),c=
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && drawer.classList.contains('open')) setOpen(false); });
   })();
 
-  /* ---- Teams: 2 to 20 seats self serve, above that is a call. $39 per seat per month from pricing.ts. ---- */
-  var sl = document.getElementById('seats'), o = document.getElementById('seatsOut'), tt = document.getElementById('teamTotal');
-  function seats() { var n = parseInt(sl.value, 10); o.textContent = n === 20 ? '20+' : String(n); tt.textContent = n === 20 ? '$780 a month for 20 seats. More than 20? Book a demo.' : '$' + (n * 39) + ' a month for ' + n + ' seats'; }
-  if (sl && o && tt) { sl.addEventListener('input', seats); seats(); }
+  /* ---- The Teams size slider and its running total went with the figures on 16 Sep 2026. Teams is arranged on a call, so there is nothing on
+         this page left to compute. ---- */
 
   /* ---- Font self check: the three app fonts are inlined under unique names, so a failed load cannot be masked by a system Inter. ---- */
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {

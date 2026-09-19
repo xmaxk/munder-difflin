@@ -47,7 +47,7 @@ On 14 Sep 2026 the page listed version 0.5.2, published 9 Sep 2026, in three bui
 
 {% img "a3-download" %}
 
-Open the file the usual way for your system: drag the app to Applications on a Mac, run the installer on Windows, or make the AppImage executable on Linux. [Every release](https://app.harnessmd.com/releases/) is listed with notes and checksums.
+Open the file the usual way for your system: drag the app to Applications on a Mac, run the installer on Windows, or make the AppImage executable on Linux. [What changed in this version](https://harnessmd.com/download#whats-new) is written out on the download page.
 
 ## What do you need installed before the first launch?
 
