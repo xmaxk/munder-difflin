@@ -1,6 +1,6 @@
 {
   "name": "munder-difflin",
-  "version": "0.4.6",
+  "version": "0.5.2.fork",
   "private": true,
   "packageManager": "pnpm@10.12.1",
   "pnpm": {
