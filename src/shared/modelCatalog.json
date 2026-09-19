@@ -65,7 +65,10 @@
       { "id": "openai/gpt-5-mini", "label": "GPT-5 mini (OpenAI)", "minAppVersion": null, "maxAppVersion": null },
       { "id": "openrouter/anthropic/claude-sonnet-4.5", "label": "Claude Sonnet 4.5 (OpenRouter)", "minAppVersion": null, "maxAppVersion": null },
       { "id": "google/gemini-2.5-pro", "label": "Gemini 2.5 Pro (Google)", "minAppVersion": null, "maxAppVersion": null },
-      { "id": "local/llama3", "label": "Local · OpenAI-compatible (set base-URL)", "minAppVersion": null, "maxAppVersion": null }
+      { "id": "local/llama3", "label": "Local · OpenAI-compatible (set base-URL)", "minAppVersion": null, "maxAppVersion": null },
+      { "id": "local/Qwen3-Coder-30B-A3B-Instruct-GGUF", "label": "Qwen3-Coder 30B · Lemonade (local)", "minAppVersion": null, "maxAppVersion": null },
+      { "id": "local/gpt-oss-120b-mxfp-GGUF", "label": "gpt-oss 120B · Lemonade (local)", "minAppVersion": null, "maxAppVersion": null },
+      { "id": "local/Nanbeige4.2-3B-GGUF-Nanbeige4.2-3B-Q8_0.gguf", "label": "Nanbeige4.2 3B · Lemonade (local)", "minAppVersion": null, "maxAppVersion": null }
     ],
     "crush": [
       { "label": "Crush default (config)", "minAppVersion": null, "maxAppVersion": null },

@@ -16,8 +16,12 @@ import { dirname } from 'node:path';
 import { getText } from './fetchText';
 import { parseModelCatalog, type ModelCatalog } from '../shared/modelCatalogPayload';
 
+// Fork: point at THIS fork's catalog, not upstream's, so an upstream remote
+// catalog can never overwrite our baked provider lists (notably the local/
+// Lemonade rows on `opencode`). Absent the file the fetch 404s and the baked
+// copy is kept — a safe default either way.
 const CATALOG_URL =
-  'https://raw.githubusercontent.com/chaitanyagiri/munder-difflin/main/docs/model-catalog.json';
+  'https://raw.githubusercontent.com/xmaxk/munder-difflin/main/docs/model-catalog.json';
 
 /** Models ship on a human timescale, and a stale list costs the user nothing —
  *  every command field in the app stays editable. Six hours matches the hero

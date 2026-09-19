@@ -283,15 +283,23 @@ telemetry.onApiError((agentId) => breaker.recordError(agentId));
 // on every UserPromptSubmit (Edit Agent saves land here via persistAgents).
 const roster = new RosterStore(() => readConfig().harnessHome);
 function standingGoalFromRoster(agentId: string): string | null {
+  // 1) An operator-set standing goal (Edit Agent UI → RosterStore) always wins.
   const snap = roster.read();
-  if (!snap || !Array.isArray(snap.agents)) return null;
-  for (const entry of snap.agents) {
-    if (!entry || typeof entry !== 'object') continue;
-    const a = entry as { id?: unknown; goal?: unknown };
-    if (a.id !== agentId) continue;
-    return typeof a.goal === 'string' && a.goal.trim() ? a.goal.trim() : null;
+  if (snap && Array.isArray(snap.agents)) {
+    for (const entry of snap.agents) {
+      if (!entry || typeof entry !== 'object') continue;
+      const a = entry as { id?: unknown; goal?: unknown };
+      if (a.id !== agentId) continue;
+      if (typeof a.goal === 'string' && a.goal.trim()) return a.goal.trim();
+      break; // matched the agent but it has no goal — fall through to its objective
+    }
   }
-  return null;
+  // 2) Ephemeral workers have no RosterStore entry: fall back to the spawn
+  //    OBJECTIVE recorded in the hive registry, so a worker's task rides the same
+  //    durable standing-goal hook injection (re-delivered on each session
+  //    (re)start), not only the one-shot seed + inbox briefing.
+  const obj = hive.registry().agents[agentId]?.objective;
+  return typeof obj === 'string' && obj.trim() ? obj.trim() : null;
 }
 // Worker inbox-wake watchdog (#151): finds idle workers with undrained inbox mail
 // and types the same guarded nudge the renderer would have (so a throttled
@@ -4958,7 +4966,12 @@ async function processSpawnRequest(filePath: string): Promise<void> {
     provider: raw.provider,
     role: 'worker',
     cwd,
-    ...(profile === 'lightweight' ? { profile, objective } : {})
+    // Record the objective on every worker (not just lightweight): it is read back
+    // as the worker's durable standing goal (see standingGoalFromRoster) and
+    // re-injected by the hook on each session (re)start. `profile` stays
+    // lightweight-only — it gates the stripped-down seed.
+    ...(objective ? { objective } : {}),
+    ...(profile === 'lightweight' ? { profile } : {})
   };
   // Phase 2: grant this worker a broker capability over the currently-enabled
   // integrations and inject the broker URL + a per-worker capability TOKEN (a handle,

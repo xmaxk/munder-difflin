@@ -63,7 +63,10 @@ const SHIPPED = {
     ["openai/gpt-5-mini", "GPT-5 mini (OpenAI)"],
     ["openrouter/anthropic/claude-sonnet-4.5", "Claude Sonnet 4.5 (OpenRouter)"],
     ["google/gemini-2.5-pro", "Gemini 2.5 Pro (Google)"],
-    ["local/llama3", "Local · OpenAI-compatible (set base-URL)"]
+    ["local/llama3", "Local · OpenAI-compatible (set base-URL)"],
+    ["local/Qwen3-Coder-30B-A3B-Instruct-GGUF", "Qwen3-Coder 30B · Lemonade (local)"],
+    ["local/gpt-oss-120b-mxfp-GGUF", "gpt-oss 120B · Lemonade (local)"],
+    ["local/Nanbeige4.2-3B-GGUF-Nanbeige4.2-3B-Q8_0.gguf", "Nanbeige4.2 3B · Lemonade (local)"]
   ],
   crush: [
     [undefined, "Crush default (config)"],
